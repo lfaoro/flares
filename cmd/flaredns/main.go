@@ -1,10 +1,13 @@
+// Flaredns backups the DNS records table of all provided Cloudflare domains.
 package main
 
 import (
 	"flag"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -18,9 +21,8 @@ import (
 var (
 	log           = logger.New()
 	start         = time.Now().UTC().Format(time.RFC3339)
-	develFlag     = flag.Bool("devel", false, "Activates development mode.")
-	timeFrameFlag = flag.Duration("timeframe", time.Second*5, "Every how often to execute the program operations.")
-	domainsFlag   = flag.String("domains", "vlct.io", "Comma(,) separated list of domains from which to export the BIND formatted DNS records table.")
+	timeFrameFlag = flag.Duration("timeframe", 0, "Every how often to execute the program operations.")
+	domainsFlag   = flag.String("domains", "", "Comma(,) separated list of domains from which to export the BIND formatted DNS records table.")
 )
 
 // Environment variables
@@ -47,6 +49,15 @@ func init() {
 }
 
 func main() {
+	if *domainsFlag == "" {
+		fmt.Println(`
+Error: no domains provided
+	`)
+		flag.Usage()
+		os.Exit(1)
+	}
+	domains := parseDomains(*domainsFlag)
+
 	cf := export.Cloudflare{
 		API:       "https://api.cloudflare.com/client/v4",
 		AuthKey:   cfAuthKey,
@@ -55,29 +66,51 @@ func main() {
 			Timeout: time.Second * 10,
 		},
 	}
-	domains := parseDomains(*domainsFlag)
-	domain := domains[0]
-	table, err := cf.Export(domain)
+	files, err := createTables(domains, cf)
 	log.FatalIfErr(err)
-	domain = strings.Replace(domain, ".", "_", -1)
 
-	// create file
-	file, _ := os.Create(domain + ".bind")
-	defer file.Close()
-	file.Write(table)
-	filePath := "./" + file.Name()
-
+	gitDir := os.TempDir() + "cf_dns_bck/"
 	repo := &vcs.Git{
 		Repository: gitRepo,
 		Username:   gitUsername,
 		Password:   gitPassword,
-		Directory:  os.TempDir() + "cf_dns_bck/",
+		Directory:  gitDir,
 	}
 	log.FatalIfErr(repo.Clone())
-	log.FatalIfErr(repo.Add(filePath))
+	for _, f := range files {
+		log.LogIfErr(repo.Add(f))
+	}
 	log.FatalIfErr(repo.Push())
+	// cleanup
+	os.RemoveAll(gitDir)
 }
 
 func parseDomains(d string) []string {
 	return strings.Split(d, ",")
+}
+
+func createTables(domains []string, cf export.Cloudflare) (files []string, err error) {
+	filesDir := filepath.Join(os.TempDir(), "tables")
+	if err := os.MkdirAll(filesDir, 0750); err != nil {
+		return nil, err
+	}
+	for _, domain := range domains {
+		filePath := filepath.Join(filesDir, domain+".bind")
+		table, err := cf.Export(domain)
+		if err != nil {
+			return nil, err
+		}
+		domain = strings.Replace(domain, ".", "_", -1)
+		file, err := os.Create(filePath)
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+		_, err = file.Write(table)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, filePath)
+	}
+	return files, nil
 }

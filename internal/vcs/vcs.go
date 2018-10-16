@@ -92,12 +92,12 @@ func (g *Git) Push() error {
 	return cmd.Run()
 }
 
-func (g *Git) Clean(dir string) {
+func (g *Git) Clean(dir string) error {
 	g.once.Do(func() {
 		g.init()
 	})
 	cmd := exec.Command("rm", "-rf", g.Directory)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
-	cmd.Run()
+	return cmd.Run()
 }
