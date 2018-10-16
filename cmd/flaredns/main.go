@@ -8,18 +8,17 @@ import (
 	"strings"
 	"time"
 
-	"git.vlct.io/vaulter/vaulter/cmd/cf-backup/export"
-	"git.vlct.io/vaulter/vaulter/cmd/cf-backup/vcs"
+	"git.vlct.io/vaulter/vaulter/pkg/logger"
 
 	"github.com/gobuffalo/envy"
-
-	"git.vlct.io/vaulter/vaulter/pkg/logger"
+	"github.com/lfaoro/flares/internal/export"
+	"github.com/lfaoro/flares/internal/vcs"
 )
 
 var (
 	log           = logger.New()
 	start         = time.Now().UTC().Format(time.RFC3339)
-	develFlag     = flag.Bool("devel", true, "Activates development mode.")
+	develFlag     = flag.Bool("devel", false, "Activates development mode.")
 	timeFrameFlag = flag.Duration("timeframe", time.Second*5, "Every how often to execute the program operations.")
 	domainsFlag   = flag.String("domains", "vlct.io", "Comma(,) separated list of domains from which to export the BIND formatted DNS records table.")
 )

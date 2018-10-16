@@ -1,0 +1,7 @@
+# git.vlct.io/vaulter/vaulter v0.0.0-20181016160206-cfc26bbfdc2c
+git.vlct.io/vaulter/vaulter/pkg/logger
+git.vlct.io/vaulter/vaulter/pkg/svc
+# github.com/gobuffalo/envy v1.6.5
+github.com/gobuffalo/envy
+# github.com/joho/godotenv v1.3.0
+github.com/joho/godotenv
