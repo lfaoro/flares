@@ -8,7 +8,7 @@ A collection of utilities that help you interact with the CloudFlare service.
 ## Installation
 Golang must be installed: https://golang.org/dl/
 ```bash
-# flaredns
+# flaredns backups your domain DNS table into a git repo.
 $ go get -u github.com/lfaoro/flares/cmd/flaredns
 $ cd $GOPATH/src/github.com/lfaoro/flares/
 # flarelogs (coming soon)
