@@ -1,4 +1,4 @@
-# Flares 🔥
+# Flares ??
 
 A collection of utilities that help you interact with the CloudFlare service.
 
@@ -6,6 +6,7 @@ A collection of utilities that help you interact with the CloudFlare service.
 [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
 
 ## Installation
+Golang must be installed: https://golang.org/dl/
 ```bash
 # flaredns
 $ go get -u github.com/lfaoro/flares/cmd/flaredns
