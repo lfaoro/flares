@@ -1,21 +1,22 @@
 # Flares 🔥
 
-A collection of utilities that help you interact with the CloudFlare service.
+Flares is a cloudflare DNS backup tool: every time it runs it dumps your configured DNS settings and commits/pushes them to a git repo.
+
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
 
-## Installation
+## Manual Installation
 Golang must be installed: https://golang.org/dl/
 ```bash
-# flaredns backups your domain DNS table into a git repo.
+# flaredns
 $ go get -u github.com/lfaoro/flares/cmd/flaredns
 $ cd $GOPATH/src/github.com/lfaoro/flares/
 # flarelogs (coming soon)
 # $ go get -u github.com/lfaoro/flares/cmd/flarelogs
 ```
 
-## Quick start (painless)
+## Docker Quick start (painless)
 ```bash
 # CloudFlare auth key is here: https://dash.cloudflare.com/profile ->
 # Global API Key -> View
