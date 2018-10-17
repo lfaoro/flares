@@ -23,6 +23,7 @@ var (
 	start         = time.Now().UTC().Format(time.RFC3339)
 	timeFrameFlag = flag.Duration("timeframe", 0, "Every how often to execute the program operations.")
 	domainsFlag   = flag.String("domains", "", "Comma(,) separated list of domains from which to export the BIND formatted DNS records table.")
+	versionFlag   = flag.Bool("version", false, "Program semantic version.")
 )
 
 // Environment variables
@@ -49,6 +50,10 @@ func init() {
 }
 
 func main() {
+	if *versionFlag {
+		fmt.Println(Version)
+		os.Exit(0)
+	}
 	if *domainsFlag == "" {
 		fmt.Println(`
 Error: no domains provided
