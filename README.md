@@ -4,7 +4,6 @@ A collection of utilities that help you interact with the CloudFlare service.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
-[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/lfaoro/flares)
 
 ## Installation
 ```bash
@@ -34,7 +33,7 @@ make docker
 ```
 ### Run the app
 ```bash
-docker run -it --rm flares flaredns -domain awesome.tld,awesome2.tld
+docker run -it --rm flares flaredns -domains awesome.tld,awesome2.tld
 ```
 
 # Contibuting
