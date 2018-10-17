@@ -16,7 +16,7 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 ```
 
 ## Quick start (painless)
-```
+```bash
 $ docker run -it --rm \
 -e CF_AUTH_KEY="" \
 -e CF_AUTH_KEY="" \
