@@ -46,6 +46,6 @@ docker run -it --rm flares flaredns -domains awesome.tld,awesome2.tld
 - Create a new pull request against the master branch
 
 ## TODO
-- [] use https://github.com/spf13/cobra for the CLI interface
-- [] add the flarelogs command
-- [] use a git library instead of our own hacky interface
+- [ ] use https://github.com/spf13/cobra for the CLI interface
+- [ ] add the flarelogs command
+- [ ] use a git library instead of our own hacky interface
