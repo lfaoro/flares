@@ -1,4 +1,4 @@
-# Flares ??
+# Flares 🔥
 
 A collection of utilities that help you interact with the CloudFlare service.
 
