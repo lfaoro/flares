@@ -17,6 +17,8 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 
 ## Quick start (painless)
 ```bash
+# CloudFlare auth key is here: https://dash.cloudflare.com/profile
+# Global API Key -> View
 $ docker run -it --rm \
 -e CF_AUTH_KEY="" \
 -e CF_AUTH_KEY="" \
