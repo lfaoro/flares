@@ -16,7 +16,8 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 ```
 
 ## Quick start (painless)
-docker run -it --rm \
+```
+$ docker run -it --rm \
 -e CF_AUTH_KEY="" \
 -e CF_AUTH_KEY="" \
 -e CF_AUTH_EMAIL="" \
@@ -24,6 +25,7 @@ docker run -it --rm \
 -e GIT_USERNAME="" \
 -e GIT_PASSWORD="" \
 lfaoro/flares flaredns -domains awesome.tld,awesome2.tld
+```
 
 ## Quick start (I want full control)
 ### Fill the .env with your CloudFlare and Git credentials
