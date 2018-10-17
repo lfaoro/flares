@@ -15,7 +15,17 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 # $ go get -u github.com/lfaoro/flares/cmd/flarelogs
 ```
 
-## Quick start
+## Quick start (painless)
+docker run -it --rm \
+-e CF_AUTH_KEY="" \
+-e CF_AUTH_KEY="" \
+-e CF_AUTH_EMAIL="" \
+-e GIT_REPO="" \
+-e GIT_USERNAME="" \
+-e GIT_PASSWORD="" \
+lfaoro/flares flaredns -domains awesome.tld,awesome2.tld
+
+## Quick start (I want full control)
 ### Fill the .env with your CloudFlare and Git credentials
 ```bash
 # Provide a .env file in your project with the following variables or export them.
@@ -30,7 +40,7 @@ EOF
 ```
 ### Create your docker container
 ```bash
-make docker
+docker build -t flares .
 ```
 ### Run the app
 ```bash

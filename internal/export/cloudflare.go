@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 type Cloudflare struct {
@@ -64,11 +66,15 @@ func (cf Cloudflare) zoneFor(domain string) (string, error) {
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
 		return "", err
 	}
+	if !response.Success {
+		return "", errors.New("cloudflare: domain not found")
+	}
 	return response.Result[0].ID, nil
 }
 
 type response struct {
-	Result []struct {
+	Success bool `json:"success"`
+	Result  []struct {
 		ID string `json:"id"`
 	} `json:"result"`
 }

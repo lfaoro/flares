@@ -14,4 +14,8 @@ dep:
 	go mod vendor
 
 docker:
-	docker build -t flares .
+	rm .dockerignore || :
+	echo ".env" > .dockerignore
+	docker build -t lfaoro/flares .
+	docker push lfaoro/flares
+	rm .dockerignore || :
