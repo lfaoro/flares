@@ -1,0 +1,5 @@
+.env
+idea.md
+*.bind
+.dockerignore
+flaredns
