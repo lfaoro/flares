@@ -85,7 +85,10 @@ var ExportCmd = &cobra.Command{
 				table, err := cf.ExportDNS(domain)
 				log.LogIfErr(err)
 				domain = strings.Replace(domain, ".", "_", -1)
-				filePath := filepath.Join(dir, domain+".bind")
+				// TODO: Supressed the error for now, should add proper error checks at some point.
+				fullDir, err := filepath.Abs(dir)
+				log.FatalIfErr(err)
+				filePath := filepath.Join(fullDir, domain+".bind")
 				writeFile(table, filePath)
 				fmt.Println("Exported:", filePath)
 			}
