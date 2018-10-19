@@ -39,7 +39,7 @@ EOF
 $ make install
 $ flaredns -h
 $ flaredns domain.tld
-$ flaredns -export /tmp/tables/ domain.tld
+$ flaredns export -d /tmp/tables/ domain.tld
 ```
 
 # Contributing
