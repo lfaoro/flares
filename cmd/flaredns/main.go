@@ -23,7 +23,6 @@ var (
 	start       = time.Now().UTC().Format(time.RFC3339)
 	exportFlag  = flag.String("export", "", "Path where to export the DNS table files.")
 	versionFlag = flag.Bool("version", false, "Program semantic version.")
-	// TODO: separate concerns add `-backup` flag
 )
 
 // Environment variables
@@ -36,7 +35,6 @@ var (
 func init() {
 	flag.Parse()
 	rand.Seed(time.Now().UnixNano())
-	// load environment variables
 	envy.Load()
 	cfAuthKey, envErr = envy.MustGet("CF_AUTH_KEY")
 	cfAuthEmail, envErr = envy.MustGet("CF_AUTH_EMAIL")

@@ -54,4 +54,4 @@ $ flaredns -export /tmp/tables/ domain.tld
 ## TODO
 - [ ] use https://github.com/spf13/cobra for the CLI interface
 - [ ] add the flarelogs command
-- [ ] use a git library instead of our own hacky interface
+- [ ] add `all` keyword to export all the domains available in the account
