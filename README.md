@@ -1,6 +1,8 @@
 # Flares 🔥
 
-Flares is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen || optionally exports it into nicely formatted files.
+Flares is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen.
+
+Optionally exports the data into (BIND formatted) zone files.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
 

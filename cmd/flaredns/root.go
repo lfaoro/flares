@@ -69,11 +69,7 @@ var ExportCmd = &cobra.Command{
 		}
 
 		dir, err := cmd.Flags().GetString("dir")
-
-		if err != nil {
-			log.FatalIfErr(err)
-		}
-
+		log.FatalIfErr(err)
 		if dir == "" {
 			for _, domain := range args {
 				b, err := cf.ExportDNS(domain)
