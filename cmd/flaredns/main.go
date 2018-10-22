@@ -20,8 +20,8 @@ var (
 // Environment variables
 var (
 	exportFlag  string
-	cfAuthKey  = svc.MustGetEnv("CF_AUTH_KEY")
-	cfAuthEmail = svc.MustGetEnv("CF_AUTH_EMAIL")
+	cfAuthKey  = svc.MustGetEnv("CF_API_KEY")
+	cfAuthEmail = svc.MustGetEnv("CF_API_EMAIL")
 )
 
 func init() {
