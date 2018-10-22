@@ -3,13 +3,12 @@
 package main
 
 import (
+	"github.com/vlct-io/pkg/svc"
 	"math/rand"
 	"os"
 	"time"
 
 	"github.com/vlct-io/pkg/logger"
-
-	"github.com/gobuffalo/envy"
 	"github.com/spf13/cobra"
 )
 
@@ -21,26 +20,19 @@ var (
 // Environment variables
 var (
 	exportFlag  string
-	envErr      error
-	cfAuthKey   string
-	cfAuthEmail string
+	cfAuthKey  = svc.MustGetEnv("CF_AUTH_KEY")
+	cfAuthEmail = svc.MustGetEnv("CF_AUTH_EMAIL")
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 
-	envy.Load()
-	cfAuthKey, envErr = envy.MustGet("CF_AUTH_KEY")
-	cfAuthEmail, envErr = envy.MustGet("CF_AUTH_EMAIL")
-
 	cobra.OnInitialize(initConfig)
 	RootCmd.AddCommand(VersionCmd)
 	RootCmd.AddCommand(ExportCmd)
-	return
 }
 
 func main() {
-
 	// This should be all that's needed after everything gets converted.
 	Execute()
 }
