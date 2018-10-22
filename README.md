@@ -8,7 +8,7 @@ Optionally exports the data into (BIND formatted) zone files.
 
 ![flaredns_demo](static/flaredns_demo.gif)
 
-## Docker Quick start (painless)
+## Quick Start - docker (painless)
 ```bash
 # CloudFlare auth key is here: https://dash.cloudflare.com/profile ->
 # Global API Key -> View
@@ -18,7 +18,7 @@ $ docker run -it --rm \
 lfaoro/flares domain1.tld domain2.tld
 ```
 
-## Quick start (full control)
+## Quick Start - compile (full control)
 Golang must be installed: https://golang.org/dl/
 ```bash
 # flaredns
@@ -27,14 +27,11 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 # flarelogs (coming soon)
 # $ go get -u github.com/lfaoro/flares/cmd/flarelogs
 ```
-### Fill the .env with your CloudFlare and Git credentials
+### Set the API key and account email address.
 ```bash
-# Provide a .env file in your project with the following variables or export them.
-# Check .env.example
-$ cat > .env << EOF
-CF_AUTH_KEY=""
-CF_AUTH_EMAIL=""
-EOF
+$ flaredns auth # (coming soon) opens the dashboard at https://dash.cloudflare.com/profile
+$ export CF_API_KEY=abcdef1234567890
+$ export CF_API_EMAIL=someone@example.com
 ```
 ### Run the app
 ```bash
@@ -57,3 +54,4 @@ $ flaredns export -d /tmp/tables/ domain.tld
 - [ ] use https://github.com/spf13/cobra for the CLI interface
 - [ ] add the flarelogs command
 - [ ] add `all` keyword to export all the domains available in the account
+- [ ] add `auth` command, automatically opens CloudFlare dashboard
