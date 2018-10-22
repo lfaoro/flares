@@ -24,12 +24,12 @@ Golang must be installed: https://golang.org/dl/
 # flaredns
 $ go get -u github.com/lfaoro/flares/cmd/flaredns
 $ cd $GOPATH/src/github.com/lfaoro/flares/
-# flarelogs (coming soon)
+# flarelogs (TODO: coming soon)
 # $ go get -u github.com/lfaoro/flares/cmd/flarelogs
 ```
 ### Set the API key and account email address.
 ```bash
-$ flaredns auth # (coming soon) opens the dashboard at https://dash.cloudflare.com/profile
+$ flaredns auth # (TODO: coming soon) opens the dashboard at https://dash.cloudflare.com/profile
 $ export CF_API_KEY=abcdef1234567890
 $ export CF_API_EMAIL=someone@example.com
 ```
@@ -55,3 +55,5 @@ $ flaredns export -d /tmp/tables/ domain.tld
 - [ ] add the flarelogs command
 - [ ] add `all` keyword to export all the domains available in the account
 - [ ] add `auth` command, automatically opens CloudFlare dashboard
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_large)
