@@ -5,6 +5,7 @@ Flares is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table
 Optionally exports the data into (BIND formatted) zone files.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_shield)
 
 ![flaredns_demo](static/flaredns_demo.gif)
 
@@ -57,3 +58,7 @@ $ flaredns export -d /tmp/tables/ domain.tld
 - [ ] use https://github.com/spf13/cobra for the CLI interface
 - [ ] add the flarelogs command
 - [ ] add `all` keyword to export all the domains available in the account
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_large)
