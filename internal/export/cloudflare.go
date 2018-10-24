@@ -25,6 +25,9 @@ var _ CloudDNS = Cloudflare{}
 
 // ExportDNS fetches the BIND DNS table for a domain.
 func (cf Cloudflare) ExportDNS(domain string) ([]byte, error) {
+	if cf.AuthKey == "" || cf.AuthEmail == "" {
+		return nil, errors.New("missing required AuthKey || AuthEmail")
+	}
 	return cf.exportFor(domain)
 }
 
@@ -75,6 +78,7 @@ func (cf Cloudflare) zoneFor(domain string) (string, error) {
 		return "", err
 	}
 	if !response.Success {
+		fmt.Println("DEBUG:", response.Errors)
 		return "", errors.New(errDomainNotFound)
 	}
 	if len(response.Result) == 0 {
@@ -84,7 +88,8 @@ func (cf Cloudflare) zoneFor(domain string) (string, error) {
 }
 
 type response struct {
-	Success bool `json:"success"`
+	Success bool        `json:"success"`
+	Errors  interface{} `json:"errors"`
 	Result  []struct {
 		ID string `json:"id"`
 	} `json:"result"`

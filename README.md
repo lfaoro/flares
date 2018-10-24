@@ -32,6 +32,9 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 $ flaredns auth # (TODO: coming soon) opens the dashboard at https://dash.cloudflare.com/profile
 $ export CF_API_KEY=abcdef1234567890
 $ export CF_API_EMAIL=someone@example.com
+# alternatively you can provide a `.flaredns` file in your
+# $HOME directory with the above variables or specify its path
+# with `--config <filePath>`
 ```
 ### Run the app
 ```bash
