@@ -1,7 +1,7 @@
 package main
 
 var (
-	// Version ...
+	// Version is the program version.
 	Version = "1.0.0-beta"
 )
 

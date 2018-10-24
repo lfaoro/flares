@@ -9,14 +9,13 @@ import (
 	"time"
 
 	"github.com/lfaoro/flares/internal/export"
-
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
-	client  export.Cloudflare
+	client export.Cloudflare
 
 	cfgFileFlag string
 	exportFlag  string
@@ -36,12 +35,24 @@ func init() {
 var rootCmd = &cobra.Command{
 	Use:     "flaredns",
 	Short:   "flaredns is a CloudFlare DNS backup tool.",
-	Long:    `Flares is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen. Optionally exports the data into (BIND formatted) zone files.`,
+	Long:    `flaredns is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen. Optionally exports the data into (BIND formatted) zone files.`,
 	Version: Version,
 	// Args:    cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if allFlag {
-			// All
+			zones, err := client.AllZones()
+			if err != nil {
+				return err
+			}
+			for _, zone := range zones {
+				split := strings.Split(zone, ",")
+				fmt.Println("domain:", split[1])
+				table, err := client.ExportDNS(split[1])
+				if err != nil {
+					return err
+				}
+				fmt.Fprintf(os.Stdout, string(table))
+			}
 			return nil
 		}
 		if exportFlag != "" {
@@ -56,7 +67,7 @@ var rootCmd = &cobra.Command{
 				if err != nil {
 					return err
 				}
-				if err := os.MkdirAll(fullDir, 0755); err !=nil{
+				if err := os.MkdirAll(fullDir, 0755); err != nil {
 					return err
 				}
 				filePath := filepath.Join(fullDir, domain+".bind")
@@ -95,7 +106,7 @@ func initConfig() {
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".flaredns")
 	}
-		// If a config file is found, read it in.
+	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}

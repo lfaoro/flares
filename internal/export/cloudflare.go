@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -56,6 +57,41 @@ func (cf Cloudflare) exportFor(domain string) ([]byte, error) {
 	return body, nil
 }
 
+func (cf Cloudflare) AllZones() ([]string, error) {
+	endpoint := cf.API + "/zones" + fmt.Sprintf("?match=%v", "all")
+	parsed, err := url.Parse(endpoint)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("GET", parsed.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("x-auth-key", cf.AuthKey)
+	req.Header.Add("x-auth-email", cf.AuthEmail)
+	res, err := cf.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	response := response{}
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+	if !response.Success {
+		fmt.Println("DEBUG:", response.Errors)
+		return nil, errors.New(errDomainNotFound)
+	}
+	if len(response.Result) == 0 {
+		return nil, errors.New(errDomainNotFound)
+	}
+	var result []string
+	for _, res := range response.Result {
+		result = append(result, strings.Join([]string{res.ID, res.Name}, ","))
+	}
+	return result, nil
+}
+
 func (cf Cloudflare) zoneFor(domain string) (string, error) {
 	endpoint := cf.API + "/zones" + fmt.Sprintf("?name=%v", domain)
 	parsed, err := url.Parse(endpoint)
@@ -91,6 +127,7 @@ type response struct {
 	Success bool        `json:"success"`
 	Errors  interface{} `json:"errors"`
 	Result  []struct {
-		ID string `json:"id"`
+		ID   string `json:"id"`
+		Name string `json:"name"`
 	} `json:"result"`
 }
