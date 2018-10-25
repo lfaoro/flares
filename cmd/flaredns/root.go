@@ -8,105 +8,143 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/cobra"
-
 	"github.com/lfaoro/flares/internal/export"
+	homedir "github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-var RootCmd = &cobra.Command{
-	Use:   "flaredns",
-	Short: "TODO",
-	Long:  `flaredns is a tool for reading and exporting DNS tables`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-	},
-	PreRun: func(cmd *cobra.Command, args []string) {
-	},
-	Run: func(cmd *cobra.Command, args []string) {
+var (
+	client export.Cloudflare
 
-	},
-	PostRun: func(cmd *cobra.Command, args []string) {
-	},
+	cfgFileFlag string
+	exportFlag  string
+	allFlag     bool
+)
+
+func init() {
+	cobra.OnInitialize(initConfig)
+
+	// rootCmd.PersistentFlags().StringVar(&cfgFileFlag, "config", "", "config file (default is $HOME/.tmp.yaml)")
+
+	rootCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "retrieve DNS records table for all domains.")
+	rootCmd.Flags().StringVarP(&exportFlag, "export", "e", "", "export the DNS table into BIND formatted files.")
 }
 
-var VersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "prints program semantic version",
-	Long:  ``,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-	},
-	PreRun: func(cmd *cobra.Command, args []string) {
-	},
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("flaredns | %s\n", Version)
-	},
-	PostRun: func(cmd *cobra.Command, args []string) {
-	},
-}
-
-var ExportCmd = &cobra.Command{
-	Use:   "export",
-	Short: "outputs DNS table for given domains",
-	Long:  ``,
-	Args:  cobra.MinimumNArgs(1),
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-	},
-	PreRun: func(cmd *cobra.Command, args []string) {
-	},
-	Run: func(cmd *cobra.Command, args []string) {
-		cf := export.Cloudflare{
-			API:       "https://api.cloudflare.com/client/v4",
-			AuthKey:   cfAuthKey,
-			AuthEmail: cfAuthEmail,
-			Client: http.Client{
-				Timeout: time.Second * 10,
-			},
-		}
-
-		dir, err := cmd.Flags().GetString("dir")
-		log.FatalIfErr(err)
-		if dir == "" {
-			for _, domain := range args {
-				b, err := cf.ExportDNS(domain)
-				log.LogIfErr(err)
-				fmt.Fprintf(os.Stdout, string(b))
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:     "flaredns",
+	Short:   "flaredns is a CloudFlare DNS backup tool.",
+	Long:    `flaredns is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen. Optionally exports the data into (BIND formatted) zone files.`,
+	Version: Version,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if allFlag {
+			zones, err := client.AllZones()
+			if err != nil {
+				return err
 			}
-		} else {
+			for _, zone := range zones {
+				split := strings.Split(zone, ",")[1]
+				table, err := client.ExportDNS(split)
+				if err != nil {
+					return err
+				}
+				fmt.Fprintf(os.Stdout, string(table))
+			}
+			return nil
+		}
+		if exportFlag != "" {
+			dir := exportFlag
 			for _, domain := range args {
-				table, err := cf.ExportDNS(domain)
-				log.LogIfErr(err)
+				table, err := client.ExportDNS(domain)
+				if err != nil {
+					return err
+				}
 				domain = strings.Replace(domain, ".", "_", -1)
-				// TODO: Supressed the error for now, should add proper error checks at some point.
 				fullDir, err := filepath.Abs(dir)
-				log.FatalIfErr(err)
+				if err != nil {
+					return err
+				}
+				if err := os.MkdirAll(fullDir, 0755); err != nil {
+					return err
+				}
 				filePath := filepath.Join(fullDir, domain+".bind")
 				writeFile(table, filePath)
 				fmt.Println("Exported:", filePath)
 			}
+			return nil
 		}
+		if len(args) == 0 {
+			cmd.Usage()
+		}
+		for _, domain := range args {
+			b, err := client.ExportDNS(domain)
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(os.Stdout, string(b))
+		}
+		return nil
 	},
-	PostRun: func(cmd *cobra.Command, args []string) {
-	},
-}
-
-// Execute adds all child commands to the root command sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := RootCmd.Execute(); err != nil {
-		log.FatalIfErr(err)
-		os.Exit(1)
-	}
-}
-
-func init() {
-	ExportCmd.Flags().StringP("dir", "d", "", "Path where to export the DNS table files.")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	if cfgFileFlag != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFileFlag)
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		// Search config in home directory with name ".flaredns" (without extension).
+		viper.AddConfigPath(home)
+		viper.SetConfigName(".flaredns")
+	}
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+
+	viper.AutomaticEnv() // read in environment variables that match
+	ok := viper.IsSet("CF_API_KEY")
+	ok = viper.IsSet("CF_API_EMAIL")
+	if !ok {
+		fmt.Println("Missing required environment variables.")
+		os.Exit(1)
+	}
+	client = export.Cloudflare{
+		API:       "https://api.cloudflare.com/client/v4",
+		AuthKey:   viper.GetString("CF_API_KEY"),
+		AuthEmail: viper.GetString("CF_API_EMAIL"),
+		Client: http.Client{
+			Timeout: time.Second * 10,
+		},
+	}
+
+}
+
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func writeFile(data []byte, filePath string) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.Write(data)
+	if err != nil {
+		return err
+	}
+	return nil
 }

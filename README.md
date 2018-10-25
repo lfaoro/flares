@@ -25,14 +25,17 @@ Golang must be installed: https://golang.org/dl/
 # flaredns
 $ go get -u github.com/lfaoro/flares/cmd/flaredns
 $ cd $GOPATH/src/github.com/lfaoro/flares/
-# flarelogs (coming soon)
+# flarelogs (TODO: coming soon)
 # $ go get -u github.com/lfaoro/flares/cmd/flarelogs
 ```
 ### Set the API key and account email address.
 ```bash
-$ flaredns auth # (coming soon) opens the dashboard at https://dash.cloudflare.com/profile
+$ flaredns auth # (TODO: coming soon) opens the dashboard at https://dash.cloudflare.com/profile
 $ export CF_API_KEY=abcdef1234567890
 $ export CF_API_EMAIL=someone@example.com
+# alternatively you can provide a `.flaredns` file in your
+# $HOME directory with the above variables or specify its path
+# with `--config <filePath>`
 ```
 ### Run the app
 ```bash
