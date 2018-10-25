@@ -37,7 +37,6 @@ var rootCmd = &cobra.Command{
 	Short:   "flaredns is a CloudFlare DNS backup tool.",
 	Long:    `flaredns is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen. Optionally exports the data into (BIND formatted) zone files.`,
 	Version: Version,
-	// Args:    cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if allFlag {
 			zones, err := client.AllZones()
@@ -45,9 +44,8 @@ var rootCmd = &cobra.Command{
 				return err
 			}
 			for _, zone := range zones {
-				split := strings.Split(zone, ",")
-				fmt.Println("domain:", split[1])
-				table, err := client.ExportDNS(split[1])
+				split := strings.Split(zone, ",")[1]
+				table, err := client.ExportDNS(split)
 				if err != nil {
 					return err
 				}
