@@ -33,16 +33,18 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 $ flaredns auth # (TODO: coming soon) opens the dashboard at https://dash.cloudflare.com/profile
 $ export CF_API_KEY=abcdef1234567890
 $ export CF_API_EMAIL=someone@example.com
-# alternatively you can provide a `.flaredns` file in your
-# $HOME directory with the above variables or specify its path
-# with `--config <filePath>`
+# alternatively you can provide a `.flaredns` file in your $HOME
+$ cat > $HOME/.flaredns << EOF
+CF_API_KEY=abcdef1234567890
+CF_API_EMAIL=someone@example.com
+EOF
 ```
 ### Run the app
 ```bash
 $ make install
 $ flaredns -h
 $ flaredns domain.tld
-$ flaredns export -d /tmp/tables/ domain.tld
+$ flaredns domain.tld -e /tmp/tables
 ```
 
 # Contributing
@@ -55,10 +57,10 @@ $ flaredns export -d /tmp/tables/ domain.tld
 - Create a new pull request against the master branch
 
 ## TODO
-- [ ] use https://github.com/spf13/cobra for the CLI interface
-- [ ] add the flarelogs command
-- [ ] add `all` keyword to export all the domains available in the account
+- [x] use https://github.com/spf13/cobra for the CLI interface
+- [x] add `all` keyword to export all the domains available in the account
 - [ ] add `auth` command, automatically opens CloudFlare dashboard
+- [ ] add the flarelogs command
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_large)

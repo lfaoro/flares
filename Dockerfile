@@ -10,9 +10,6 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
 FROM alpine:latest
 RUN apk update && apk add ca-certificates git && \
     rm -rf /var/cache/apk/*
-RUN git config --global user.email "flares@github.com" && \
-    git config --global user.name "Flares"
 COPY --from=builder /go/bin/ /usr/local/bin/
-COPY --from=builder /build/.env /usr/local/bin/
 WORKDIR /usr/local/bin/
 ENTRYPOINT ["flaredns"]

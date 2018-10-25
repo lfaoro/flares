@@ -35,7 +35,6 @@ func init() {
 var rootCmd = &cobra.Command{
 	Use:     "flaredns",
 	Short:   "flaredns is a CloudFlare DNS backup tool.",
-	Long:    `flaredns is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen. Optionally exports the data into (BIND formatted) zone files.`,
 	Version: Version,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if allFlag {
