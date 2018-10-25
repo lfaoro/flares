@@ -8,6 +8,7 @@ install:
 
 build:
 	go build -o flaredns cmd/flaredns/*.go
+	rm flaredns
 
 dep:
 	go mod init || :

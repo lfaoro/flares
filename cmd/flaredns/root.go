@@ -17,9 +17,8 @@ import (
 var (
 	client cloud.Cloudflare
 
-	cfgFileFlag string
-	exportFlag  string
-	allFlag     bool
+	exportFlag string
+	allFlag    bool
 )
 
 var rootCmd = &cobra.Command{
@@ -88,20 +87,15 @@ func flaredns(cmd *cobra.Command, args []string) error {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFileFlag != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFileFlag)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		// Search config in home directory with name ".flaredns" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".flaredns")
+	// Find home directory.
+	home, err := homedir.Dir()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
+	// Search config in home directory with name ".flaredns" (without extension).
+	viper.AddConfigPath(home)
+	viper.SetConfigName(".flaredns")
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
