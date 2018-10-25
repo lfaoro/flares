@@ -8,83 +8,82 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lfaoro/flares/internal/export"
+	"github.com/lfaoro/flares/internal/cloud"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
-	client export.Cloudflare
+	client cloud.Cloudflare
 
 	cfgFileFlag string
 	exportFlag  string
 	allFlag     bool
 )
 
-func init() {
-	cobra.OnInitialize(initConfig)
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFileFlag, "config", "", "config file (default is $HOME/.tmp.yaml)")
-
-	rootCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "retrieve DNS records table for all domains.")
-	rootCmd.Flags().StringVarP(&exportFlag, "export", "e", "", "export the DNS table into BIND formatted files.")
-}
-
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "flaredns",
 	Short:   "flaredns is a CloudFlare DNS backup tool.",
 	Version: Version,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if allFlag {
-			zones, err := client.AllZones()
+}
+
+func init() {
+	cobra.OnInitialize(initConfig)
+
+	rootCmd.RunE = flaredns
+	rootCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "retrieve DNS records table for all domains.")
+	rootCmd.Flags().StringVarP(&exportFlag, "export", "e", "", "export the DNS table into BIND formatted files.")
+}
+
+func flaredns(cmd *cobra.Command, args []string) error {
+	if allFlag {
+		zones, err := client.AllZones()
+		if err != nil {
+			return err
+		}
+		for _, zone := range zones {
+			split := strings.Split(zone, ",")[1]
+			table, err := client.DNSTableFor(split)
 			if err != nil {
 				return err
 			}
-			for _, zone := range zones {
-				split := strings.Split(zone, ",")[1]
-				table, err := client.ExportDNS(split)
-				if err != nil {
-					return err
-				}
-				fmt.Fprintf(os.Stdout, string(table))
-			}
-			return nil
-		}
-		if exportFlag != "" {
-			dir := exportFlag
-			for _, domain := range args {
-				table, err := client.ExportDNS(domain)
-				if err != nil {
-					return err
-				}
-				domain = strings.Replace(domain, ".", "_", -1)
-				fullDir, err := filepath.Abs(dir)
-				if err != nil {
-					return err
-				}
-				if err := os.MkdirAll(fullDir, 0755); err != nil {
-					return err
-				}
-				filePath := filepath.Join(fullDir, domain+".bind")
-				writeFile(table, filePath)
-				fmt.Println("Exported:", filePath)
-			}
-			return nil
-		}
-		if len(args) == 0 {
-			cmd.Usage()
-		}
-		for _, domain := range args {
-			b, err := client.ExportDNS(domain)
-			if err != nil {
-				return err
-			}
-			fmt.Fprintf(os.Stdout, string(b))
+			fmt.Fprintf(os.Stdout, string(table))
 		}
 		return nil
-	},
+	}
+	if exportFlag != "" {
+		dir := exportFlag
+		for _, domain := range args {
+			table, err := client.DNSTableFor(domain)
+			if err != nil {
+				return err
+			}
+			domain = strings.Replace(domain, ".", "_", -1)
+			fullDir, err := filepath.Abs(dir)
+			if err != nil {
+				return err
+			}
+			if err := os.MkdirAll(fullDir, 0755); err != nil {
+				return err
+			}
+			filePath := filepath.Join(fullDir, domain+".bind")
+			writeFile(table, filePath)
+			fmt.Println("Exported:", filePath)
+		}
+		return nil
+	}
+	if len(args) == 0 {
+		cmd.Usage()
+	}
+	for _, domain := range args {
+		b, err := client.DNSTableFor(domain)
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(os.Stdout, string(b))
+	}
+	return nil
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -115,7 +114,7 @@ func initConfig() {
 		fmt.Println("Missing required environment variables.")
 		os.Exit(1)
 	}
-	client = export.Cloudflare{
+	client = cloud.Cloudflare{
 		API:       "https://api.cloudflare.com/client/v4",
 		AuthKey:   viper.GetString("CF_API_KEY"),
 		AuthEmail: viper.GetString("CF_API_EMAIL"),

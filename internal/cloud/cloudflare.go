@@ -1,4 +1,4 @@
-package export
+package cloud
 
 import (
 	"encoding/json"
@@ -22,10 +22,10 @@ type Cloudflare struct {
 const errDomainNotFound = "cloudflare: domain not found"
 
 // guarantee interface compliance on build.
-var _ CloudDNS = Cloudflare{}
+var _ Service = Cloudflare{}
 
-// ExportDNS fetches the BIND DNS table for a domain.
-func (cf Cloudflare) ExportDNS(domain string) ([]byte, error) {
+// DNSTableFor fetches the BIND DNS table for a domain.
+func (cf Cloudflare) DNSTableFor(domain string) ([]byte, error) {
 	if cf.AuthKey == "" || cf.AuthEmail == "" {
 		return nil, errors.New("missing required AuthKey || AuthEmail")
 	}
