@@ -20,10 +20,7 @@ clean:
 	rm -rf vendor/ go.mod go.sum
 
 docker:
-	rm .dockerignore || :
-	echo ".env" > .dockerignore
 	docker build -t lfaoro/flares .
 	docker push lfaoro/flares
-	rm .dockerignore || :
 
 .PHONY: install

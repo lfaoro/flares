@@ -4,8 +4,7 @@ COPY . .
 RUN apk update && apk upgrade && \
     apk add git gcc
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
-    go install -mod vendor -gcflags "-N -l" ./cmd/... && \
-    touch /build/.env
+    go install -mod vendor -gcflags "-N -l" ./cmd/...
 
 FROM alpine:latest
 RUN apk update && apk add ca-certificates git && \
