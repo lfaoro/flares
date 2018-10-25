@@ -28,7 +28,7 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 # flarelogs (TODO: coming soon)
 # $ go get -u github.com/lfaoro/flares/cmd/flarelogs
 ```
-### Set the API key and account email address.
+### Set the CF_API_KEY and CF_API_EMAIL
 ```bash
 $ flaredns auth # (TODO: coming soon) opens the dashboard at https://dash.cloudflare.com/profile
 $ export CF_API_KEY=abcdef1234567890
@@ -44,7 +44,7 @@ EOF
 $ make install
 $ flaredns -h
 $ flaredns domain.tld
-$ flaredns domain.tld -e /tmp/tables
+$ flaredns domain.tld --export /tmp/tables
 ```
 
 # Contributing
