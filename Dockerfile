@@ -6,7 +6,7 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
     go install -mod vendor -gcflags "-N -l" ./cmd/...
 
 FROM alpine:latest
-RUN apk add --update --no-cache && \
+RUN apk add --update --no-cache \
     ca-certificates && \
     update-ca-certificates
 COPY --from=builder /go/bin/ /usr/local/bin/
