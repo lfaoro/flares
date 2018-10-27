@@ -12,8 +12,8 @@ build:
 
 dep:
 	go mod init || :
-	go mod verify
 	go mod tidy
+	go mod verify
 	go mod download
 	go mod vendor
 
