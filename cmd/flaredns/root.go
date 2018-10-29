@@ -37,6 +37,14 @@ func init() {
 	rootCmd.Flags().StringVarP(&emailFlag, "email", "m", "", "CloudFlare API email (defaults to $CF_API_EMAIL)")
 }
 
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
 func flaredns(cmd *cobra.Command, args []string) error {
 	if allFlag {
 		zones, err := client.AllZones()
@@ -99,14 +107,6 @@ func initClient() {
 		Client: http.Client{
 			Timeout: time.Second * 10,
 		},
-	}
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
 	}
 }
 
