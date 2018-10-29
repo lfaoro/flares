@@ -34,7 +34,7 @@ func init() {
 	rootCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "retrieve DNS records table for all domains.")
 	rootCmd.Flags().StringVarP(&exportFlag, "export", "e", "", "export the DNS table into BIND formatted files.")
 	rootCmd.Flags().StringVarP(&keyFlag, "key", "k", "", "CloudFlare API key (defaults to $CF_API_KEY)")
-	rootCmd.Flags().StringVarP(&emailFlag, "email", "m", "CloudFlare API email (defaults to $CF_API_EMAIL)", "")
+	rootCmd.Flags().StringVarP(&emailFlag, "email", "m", "", "CloudFlare API email (defaults to $CF_API_EMAIL)")
 }
 
 func flaredns(cmd *cobra.Command, args []string) error {
