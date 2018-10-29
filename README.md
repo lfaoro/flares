@@ -14,9 +14,11 @@ Optionally exports the data into (BIND formatted) zone files.
 ```bash
 # CloudFlare auth key is here: https://dash.cloudflare.com/profile ->
 # Global API Key -> View
+$ export CF_API_KEY=abcdef1234567890
+$ export CF_API_EMAIL=someone@example.com
 $ docker run -it --rm \
--e CF_API_KEY="" \
--e CF_API_EMAIL="" \
+-e CF_API_KEY="$CF_API_KEY" \
+-e CF_API_EMAIL="$CF_API_EMAIL" \
 lfaoro/flares domain1.tld domain2.tld
 ```
 
@@ -38,11 +40,6 @@ $ cd $GOPATH/src/github.com/lfaoro/flares/
 $ flaredns auth # (TODO: coming soon) opens the dashboard at https://dash.cloudflare.com/profile
 $ export CF_API_KEY=abcdef1234567890
 $ export CF_API_EMAIL=someone@example.com
-# alternatively you can provide a `.flaredns` file in your $HOME
-$ cat > $HOME/.flaredns << EOF
-CF_API_KEY=abcdef1234567890
-CF_API_EMAIL=someone@example.com
-EOF
 ```
 
 ### Run the app
