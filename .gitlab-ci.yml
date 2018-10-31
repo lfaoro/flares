@@ -13,7 +13,8 @@ backup:
     - docker run -it --rm -e CF_API_KEY="$CF_API_KEY" -e CF_API_EMAIL="$CF_API_EMAIL" lfaoro/flares $CF_DOMAINS_TO_BACKUP > backup/backup.bind
   artifacts:
     untracked: true
-    expire_in: 4 week
+    # uncomment (default is forever on gitlab.com)
+    # expire_in: 4 week
     name: "backup-${CI_COMMIT_REF_NAME}"
     paths:
      - backup/
