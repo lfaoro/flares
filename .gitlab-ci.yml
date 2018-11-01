@@ -10,7 +10,8 @@ backup:
   stage: build
   retry: 2
   script:
-    # CloudFlare auth key is here: https://dash.cloudflare.com/profile -> Global API Key -> View
+    # CloudFlare API key is here:
+    # https://dash.cloudflare.com/profile -> Global API Key -> View
     - docker run -t --rm -e CF_API_KEY="$CF_API_KEY" -e CF_API_EMAIL="$CF_API_EMAIL" lfaoro/flares $CF_DOMAINS_TO_BACKUP > dns-backup-bind.txt
   artifacts:
     untracked: true

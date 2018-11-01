@@ -12,8 +12,8 @@ Optionally exports the data into (BIND formatted) zone files.
 ## Quick Start - docker (painless)
 
 ```bash
-# CloudFlare auth key is here: https://dash.cloudflare.com/profile ->
-# Global API Key -> View
+# CloudFlare API key is here:
+# https://dash.cloudflare.com/profile -> Global API Key -> View
 $ export CF_API_KEY=abcdef1234567890
 $ export CF_API_EMAIL=someone@example.com
 $ docker run -it --rm \
