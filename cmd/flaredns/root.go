@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	client cloud.Cloudflare
-
 	exportFlag string
 	allFlag    bool
 	keyFlag    string
 	emailFlag  string
+
+	client cloud.Cloudflare
 )
 
 var rootCmd = &cobra.Command{
