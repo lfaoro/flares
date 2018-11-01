@@ -1,0 +1,21 @@
+variables:
+  GIT_STRATEGY: fetch
+  DOCKER_DRIVER: overlay
+
+services:
+  - docker:dind
+
+backup:
+  image: docker
+  stage: build
+  retry: 2
+  script:
+    # CloudFlare auth key is here: https://dash.cloudflare.com/profile -> Global API Key -> View
+    - docker run -t --rm -e CF_API_KEY="$CF_API_KEY" -e CF_API_EMAIL="$CF_API_EMAIL" lfaoro/flares $CF_DOMAINS_TO_BACKUP > dns-backup-bind.txt
+  artifacts:
+    untracked: true
+    # uncomment if needed (default is forever on gitlab.com)
+    # expire_in: 4 week
+    name: "backup-${date}"
+    paths:
+     - dns-backup-bind.txt

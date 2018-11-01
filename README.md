@@ -51,6 +51,12 @@ $ flaredns domain.tld
 $ flaredns domain.tld --export /tmp/tables
 ```
 
+### Run backup with Gitlab-CI
+
+- Copy [.gitlab-ci.yml](.gitlab-ci.yml) inside an empty gitlab project
+- Use the [pipeline schedule feature](https://gitlab.com/help/user/project/pipelines/schedules)
+- Each task run will store backup as artifacts
+
 # Contributing
 
 > Any help and suggestions are very welcome and appreciated. Start by opening an [issue](https://github.com/lfaoro/flares/issues/new).
