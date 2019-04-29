@@ -1,7 +1,7 @@
 export GO111MODULE=on
 
 run:
-	go run cmd/flaredns/*.go -domains vlct.io
+	go run cmd/flaredns/*.go vlct.io
 
 install:
 	go install ./cmd/flaredns/.
