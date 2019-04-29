@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/lfaoro/flares/internal/cloud"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/lfaoro/flares/internal/cloud"
 )
 
 var (
@@ -32,7 +31,9 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	cobra.OnInitialize(initClient)
+	cobra.OnInitialize()
+
+	client = cloud.NewCloudflare("", "")
 
 	rootCmd.SetFlagErrorFunc(func(c *cobra.Command, err error) error {
 		return errors.Wrap(err, "🔥")
@@ -101,22 +102,6 @@ func flaredns(cmd *cobra.Command, args []string) error {
 	}
 	return nil
 }
-
-func initClient() {
-	if keyFlag == "" || emailFlag == "" {
-		keyFlag = os.Getenv("CF_API_KEY")
-		emailFlag = os.Getenv("CF_API_EMAIL")
-	}
-	client = cloud.Cloudflare{
-		API:       "https://api.cloudflare.com/client/v4",
-		AuthKey:   keyFlag,
-		AuthEmail: emailFlag,
-		Client: http.Client{
-			Timeout: time.Second * 10,
-		},
-	}
-}
-
 func writeFile(data []byte, filePath string) error {
 	file, err := os.Create(filePath)
 	if err != nil {
