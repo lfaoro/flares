@@ -69,7 +69,6 @@ func (cf Cloudflare) AllZones() ([]string, error) {
 	page := 1
 	for {
 
-		req.Header.Add("Content-Type", "multipart/form-data")
 		req.Header.Add("x-auth-key", cf.AuthKey)
 		req.Header.Add("x-auth-email", cf.AuthEmail)
 
