@@ -1,17 +1,14 @@
 # Flares 🔥
 
-Flares is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen.
-
-Optionally exports the data into (BIND formatted) zone files.
+Flares is a CloudFlare DNS backup tool, it dumps your DNS table to the screen or exports it as BIND formatted zone 
+files.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_shield)
 
-[![asciicast](https://asciinema.org/a/NLVa6TyQzvTEhnzZDdH1q79lO.svg)](https://asciinema.org/a/NLVa6TyQzvTEhnzZDdH1q79lO)
-
-
-
 ## Quick Start
+
+### [Video Tutorial](https://asciinema.org/a/NLVa6TyQzvTEhnzZDdH1q79lO)
 
 ### Docker
 ```bash
@@ -32,13 +29,13 @@ lfaoro/flares domain1.tld domain2.tld
 brew install lfaoro/tap/flares
 ```
 
-### Linux
+### Linux (soon)
 ```bash
 curl apionic.com/flares.sh | bash
 ```
 
 ### Developers
-> Go language installer: https://golang.org/dl/
+> Go installer: https://golang.org/dl/
 ```bash
 go get -u github.com/lfaoro/flares
 make install
