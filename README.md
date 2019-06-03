@@ -39,7 +39,7 @@ curl apionic.com/flares.sh | bash
 
 ### Developers
 > Go language installer: https://golang.org/dl/
-```go
+```bash
 go get -u github.com/lfaoro/flares
 make install
 flares -h
