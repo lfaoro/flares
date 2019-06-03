@@ -17,6 +17,14 @@ tag:
 	git tag -f -a $(tag) -m "$(tag)"
 	git push -f origin $(tag)
 
+release:
+	cd cmd/flares && \
+	goreleaser release --rm-dist --config=../../.goreleaser.yml
+
+reltest:
+	cd cmd/flares && \
+	goreleaser release --snapshot --rm-dist --skip-publish --config=../../.goreleaser.yml
+
 dep:
 	go mod init || :
 	go mod tidy
