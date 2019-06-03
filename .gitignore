@@ -2,7 +2,6 @@
 idea.md
 *.bind
 .dockerignore
-flaredns
-*.cast
 .vscode/
 .idea/
+dist/

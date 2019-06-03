@@ -1,61 +1,75 @@
 # Flares 🔥
 
-Flares is a CloudFlare DNS backup tool: every time it runs, dumps your DNS table to the screen.
-
-Optionally exports the data into (BIND formatted) zone files.
+Flares is a CloudFlare DNS backup tool, it dumps your DNS table to the screen or exports it as BIND formatted zone 
+files.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_shield)
 
-![flaredns_demo](static/flaredns_demo.gif)
+## Quick Start
 
-## Quick Start - docker (painless)
+### [Video Tutorial](https://asciinema.org/a/NLVa6TyQzvTEhnzZDdH1q79lO)
 
+### Docker
 ```bash
-# CloudFlare API key is here:
+# Fetch your CloudFlare API key from here:
 # https://dash.cloudflare.com/profile -> Global API Key -> View
+
 $ export CF_API_KEY=abcdef1234567890
 $ export CF_API_EMAIL=someone@example.com
+
 $ docker run -it --rm \
 -e CF_API_KEY="$CF_API_KEY" \
 -e CF_API_EMAIL="$CF_API_EMAIL" \
 lfaoro/flares domain1.tld domain2.tld
 ```
 
-## Quick Start - compile (full control)
-
-Golang must be installed: https://golang.org/dl/
-
+### macOS
 ```bash
-# flaredns
-$ go get -u github.com/lfaoro/flares/cmd/flaredns
-$ cd $GOPATH/src/github.com/lfaoro/flares/
-# flarelogs (TODO: coming soon)
-# $ go get -u github.com/lfaoro/flares/cmd/flarelogs
+brew install lfaoro/tap/flares
 ```
 
-### Set the CF_API_KEY and CF_API_EMAIL
-
+### Linux (soon)
 ```bash
-$ flaredns auth # (TODO: coming soon) opens the dashboard at https://dash.cloudflare.com/profile
-$ export CF_API_KEY=abcdef1234567890
-$ export CF_API_EMAIL=someone@example.com
+curl apionic.com/flares.sh | bash
 ```
 
-### Run the app
+### Developers
+> Go installer: https://golang.org/dl/
+```bash
+go get -u github.com/lfaoro/flares
+make install
+flares -h
+
+make test
+```
+
+## Examples
 
 ```bash
 $ make install
-$ flaredns -h
-$ flaredns domain.tld
-$ flaredns domain.tld --export /tmp/tables
+$ flares -h
+
+$ flares domain1.tld
+;;
+;; Domain:     domain1.tld
+;; Exported:   2019-06-03 06:31:29
+...continued
+
+$ flares --export domain1.tld domain2.tld 
+BIND table for domain1.tld successfully exported
+BIND table for domain2.tld successfully exported
+$ ls
+domain1.tld domain2.tld
 ```
 
-### Run backup with Gitlab-CI
+## Automation
 
-- Copy [.gitlab-ci.yml](.gitlab-ci.yml) inside an empty gitlab project
-- Use the [pipeline schedule feature](https://gitlab.com/help/user/project/pipelines/schedules)
-- Each task run will store backup as artifacts
+### GitLab CI/CD
+
+- Copy [.gitlab-ci.yml](.gitlab-ci.yml) inside your repo
+- Use the [pipeline schedules](https://gitlab.com/help/user/project/pipelines/schedules) feature
+- Each run of the task will generate a DNS backup stored as a downloadable artifact
 
 # Contributing
 
@@ -66,13 +80,6 @@ $ flaredns domain.tld --export /tmp/tables
 - Commit your changes `git commit -am 'Add my feature'`
 - Push to the branch `git push origin my-new-feature`
 - Create a new pull request against the master branch
-
-## TODO
-
-- [x] use https://github.com/spf13/cobra for the CLI interface
-- [x] add `all` keyword to export all the domains available in the account
-- [ ] add `auth` command, automatically opens CloudFlare dashboard
-- [ ] add the flarelogs command
 
 ## License
 

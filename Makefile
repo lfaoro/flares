@@ -1,14 +1,29 @@
-export GO111MODULE=on
+APP ?= "./cmd/flares"
 
-run:
-	go run cmd/flaredns/*.go vlct.io
+VERSION ?= 1.0.0
+EPOCH ?= 1
+MAINTAINER ?= "Community"
+
+LDFLAGS += -X "main.date=$(shell date '+%Y-%m-%d %I:%M:%S %Z')"
 
 install:
-	go install ./cmd/flaredns/.
+	@go install -ldflags='$(LDFLAGS)' "$(APP)"
 
 build:
-	go build -o flaredns cmd/flaredns/*.go
-	rm flaredns
+	@go build -o flares "$(APP)"
+
+tag?=""
+tag:
+	git tag -f -a $(tag) -m "$(tag)"
+	git push -f origin $(tag)
+
+release:
+	cd cmd/flares && \
+	goreleaser release --rm-dist --config=../../.goreleaser.yml
+
+reltest:
+	cd cmd/flares && \
+	goreleaser release --snapshot --rm-dist --skip-publish --config=../../.goreleaser.yml
 
 dep:
 	go mod init || :
@@ -22,6 +37,6 @@ clean:
 
 docker:
 	docker build -t lfaoro/flares .
-	docker push lfaoro/flares
+	#docker push lfaoro/flares
 
 .PHONY: install

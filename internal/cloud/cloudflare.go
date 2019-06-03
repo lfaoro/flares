@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2019 Leonardo Faoro. All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+
 package cloud
 
 import (
@@ -42,15 +48,15 @@ const errDomainNotFound = "cloudflare: domain not found"
 // guarantee interface compliance on build.
 var _ Service = Cloudflare{}
 
-// DNSTableFor fetches the BIND DNS table for a domain.
-func (cf Cloudflare) DNSTableFor(domain string) ([]byte, error) {
+// TableFor fetches the BIND DNS table for a domain.
+func (cf Cloudflare) TableFor(domain string) ([]byte, error) {
 	if cf.AuthKey == "" || cf.AuthEmail == "" {
 		return nil, errors.New("missing required AuthKey || AuthEmail")
 	}
 	return cf.exportFor(domain)
 }
 
-func (cf Cloudflare) AllZones() ([]string, error) {
+func (cf Cloudflare) Zones() ([]string, error) {
 	endpoint := cf.API + "/zones" //+ "/?per_page=50"
 	u, err := url.Parse(endpoint)
 	if err != nil {
