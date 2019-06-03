@@ -1,4 +1,3 @@
-
 # Contributing
 When contributing to this project; first discuss the change you wish to make via issue, email, or any other method with the maintainers before submitting changes.
 
