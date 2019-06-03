@@ -81,6 +81,3 @@ domain1.tld domain2.tld
 - Push to the branch `git push origin my-new-feature`
 - Create a new pull request against the master branch
 
-## License
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_large)
