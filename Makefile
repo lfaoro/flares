@@ -12,6 +12,11 @@ install:
 build:
 	@go build -o flares "$(APP)"
 
+tag?=""
+tag:
+	git tag -f -a $(tag) -m "$(tag)"
+	git push -f origin $(tag)
+
 dep:
 	go mod init || :
 	go mod tidy
