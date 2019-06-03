@@ -7,7 +7,7 @@ Optionally exports the data into (BIND formatted) zone files.
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_shield)
 
-![flaredns_demo](static/flaredns_demo.gif)
+[![asciicast](https://asciinema.org/a/NLVa6TyQzvTEhnzZDdH1q79lO.svg)](https://asciinema.org/a/NLVa6TyQzvTEhnzZDdH1q79lO)
 
 
 
