@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -62,30 +63,33 @@ func (cf Cloudflare) Zones() (map[string]string, error) {
 		endpoint := cf.API + "/zones"
 		u, err := url.Parse(endpoint)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "cloudflare:")
 		}
 
 		v := url.Values{}
-		v.Add("per_page", "50")
-		v.Add("page", string(count))
+		maxPerPageValue := 50
+		v.Add("per_page", strconv.Itoa(maxPerPageValue))
+		v.Add("page", strconv.Itoa(count))
 		u.RawQuery = v.Encode()
+
+		fmt.Println(u.String())
 
 		req, err := http.NewRequest("GET", u.String(), nil)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "cloudflare:")
 		}
 
 		cf.setAuthHeaders(req)
 
 		res, err := cf.Client.Do(req)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "cloudflare:")
 		}
 		defer res.Body.Close()
 
 		data := response{}
 		if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "cloudflare:")
 		}
 
 		if !data.Success {
@@ -96,7 +100,7 @@ func (cf Cloudflare) Zones() (map[string]string, error) {
 			result[res.ID] = res.Name
 		}
 
-		pages := data.ResultInfo.TotalCount / data.ResultInfo.PerPage
+		pages := data.ResultInfo.TotalCount / maxPerPageValue
 		if count < pages {
 			count++
 			continue
