@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-package cloud
+package cloudflare
 
 import (
 	"encoding/json"
@@ -12,11 +12,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
+)
+
+const (
+	errDomainNotFound  = "cloudflare: domain not found"
+	errNoAuthorization = "cloudflare: missing required AuthKey, AuthEmail"
 )
 
 // Cloudflare sets up authorization to the API.
@@ -27,115 +30,88 @@ type Cloudflare struct {
 	Client    http.Client
 }
 
-func NewCloudflare(apiKey, apiEmail string) Cloudflare {
+func New(apiKey, apiEmail string) Cloudflare {
 	if apiKey == "" || apiEmail == "" {
-		apiKey = os.Getenv("CF_API_KEY")
-		apiEmail = os.Getenv("CF_API_EMAIL")
+		panic(errNoAuthorization)
 	}
 	client := Cloudflare{
 		API:       "https://api.cloudflare.com/client/v4",
 		AuthKey:   apiKey,
 		AuthEmail: apiEmail,
 		Client: http.Client{
-			Timeout: time.Second * 10,
+			Timeout: time.Second * 5,
 		},
 	}
 	return client
 }
 
-const errDomainNotFound = "cloudflare: domain not found"
-
-// guarantee interface compliance on build.
-var _ Service = Cloudflare{}
-
 // TableFor fetches the BIND DNS table for a domain.
 func (cf Cloudflare) TableFor(domain string) ([]byte, error) {
-	if cf.AuthKey == "" || cf.AuthEmail == "" {
-		return nil, errors.New("missing required AuthKey || AuthEmail")
-	}
-	return cf.exportFor(domain)
+	return cf.tableFor(domain)
 }
 
-func (cf Cloudflare) Zones() ([]string, error) {
-	endpoint := cf.API + "/zones" //+ "/?per_page=50"
+// ref: https://api.cloudflare.com/#zone-list-zones
+func (cf Cloudflare) Zones() (map[string]string, error) {
+	endpoint := cf.API + "/zones"
 	u, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, err
 	}
+
+	v := url.Values{}
+	v.Add("per_page", "50")
+	u.RawQuery = v.Encode()
 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	response := response{}
+	cf.setAuthHeaders(req)
 
-	var result []string
-
-	page := 1
-	for {
-
-		req.Header.Add("x-auth-key", cf.AuthKey)
-		req.Header.Add("x-auth-email", cf.AuthEmail)
-
-		q := req.URL.Query()
-		q.Set("per_page", "50")
-		req.URL.RawQuery = q.Encode()
-
-		res, err := cf.Client.Do(req)
-		if err != nil {
-			return nil, err
-		}
-		defer res.Body.Close()
-
-		if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-			return nil, err
-		}
-		if !response.Success {
-			fmt.Println("DEBUG:", response.Errors)
-			return nil, errors.New(errDomainNotFound)
-		}
-		if len(response.Result) == 0 {
-			return nil, errors.New(errDomainNotFound)
-		}
-
-		// populate result
-		for _, res := range response.Result {
-			result = append(result, strings.Join([]string{res.ID, res.Name}, ","))
-		}
-
-		totalPages := response.ResultInfo.TotalCount / response.ResultInfo.PerPage
-		if page < totalPages {
-			page++
-			q := req.URL.Query()
-			q.Add("page", string(page))
-			req.URL.RawQuery = q.Encode()
-			continue
-		}
-		break
-	}
-
-	return result, nil
-}
-
-func (cf Cloudflare) exportFor(domain string) ([]byte, error) {
-	// fetch the zone for the domain
-	zone, err := cf.zoneFor(domain)
-	if err != nil {
-		return nil, err
-	}
-	endpoint := cf.API + "/zones/" + zone + "/dns_records/export"
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("x-auth-key", cf.AuthKey)
-	req.Header.Add("x-auth-email", cf.AuthEmail)
 	res, err := cf.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
+
+	data := response{}
+	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+
+	if !data.Success {
+		return nil, errors.New(data.Errors[0].Message)
+	}
+
+	var result = map[string]string{}
+	for _, res := range data.Result {
+		result[res.ID] = res.Name
+	}
+
+	return result, nil
+}
+
+func (cf Cloudflare) tableFor(domain string) ([]byte, error) {
+	zone, err := cf.zoneIDFor(domain)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := cf.API + "/zones/" + zone + "/dns_records/export"
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	cf.setAuthHeaders(req)
+
+	res, err := cf.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
@@ -143,30 +119,38 @@ func (cf Cloudflare) exportFor(domain string) ([]byte, error) {
 	return body, nil
 }
 
-func (cf Cloudflare) zoneFor(domain string) (string, error) {
-	endpoint := cf.API + "/zones" + fmt.Sprintf("?name=%v", domain)
-	parsed, err := url.Parse(endpoint)
+
+func (cf Cloudflare) zoneIDFor(domain string) (string, error) {
+	endpoint := cf.API + "/zones"
+	u, err := url.Parse(endpoint)
 	if err != nil {
 		return "", err
 	}
-	req, err := http.NewRequest("GET", parsed.String(), nil)
+
+	v := url.Values{}
+	v.Add("name", domain)
+	u.RawQuery = v.Encode()
+
+	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return "", err
 	}
-	req.Header.Add("x-auth-key", cf.AuthKey)
-	req.Header.Add("x-auth-email", cf.AuthEmail)
+
+	cf.setAuthHeaders(req)
+
 	res, err := cf.Client.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer res.Body.Close()
+
 	response := response{}
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
 		return "", err
 	}
 	if !response.Success {
 		fmt.Println("DEBUG:", response.Errors)
-		return "", errors.New(errDomainNotFound)
+		return "", errors.New(response.Errors[0].Message)
 	}
 	if len(response.Result) == 0 {
 		return "", errors.New(errDomainNotFound)
@@ -174,9 +158,17 @@ func (cf Cloudflare) zoneFor(domain string) (string, error) {
 	return response.Result[0].ID, nil
 }
 
+func (cf Cloudflare) setAuthHeaders(req *http.Request) {
+	req.Header.Add("X-Auth-Key", cf.AuthKey)
+	req.Header.Add("X-Auth-Email", cf.AuthEmail)
+}
+
 type response struct {
-	Success  bool          `json:"success"`
-	Errors   []interface{} `json:"errors"`
+	Success bool `json:"success"`
+	Errors  []struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	} `json:"errors"`
 	Messages []interface{} `json:"messages"`
 	Result   []struct {
 		ID                  string    `json:"id"`

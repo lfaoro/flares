@@ -4,6 +4,14 @@
  * license that can be found in the LICENSE file.
  */
 
+// ___________.__
+// \_   _____/|  | _____ _______   ____   ______
+// |    __)  |  | \__  \\_  __ \_/ __ \ /  ___/
+// |     \   |  |__/ __ \|  | \/\  ___/ \___ \
+// \___  /   |____(____  /__|    \___  >____  >
+// \/              \/            \/     \/
+//
+// Flares is a CloudFlare DNS backup tool.
 package main
 
 import (
@@ -12,12 +20,11 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 
-	"github.com/lfaoro/flares/internal/cloud"
+	"github.com/lfaoro/flares/internal/cloudflare"
 )
 
 var (
@@ -82,18 +89,17 @@ func main() {
 		if flagAPIKey == "" || flagAPIEmail == "" {
 			return errors.New("provide --key & --email")
 		}
-		dns := cloud.NewCloudflare(flagAPIKey, flagAPIEmail)
+
+		dns := cloudflare.New(flagAPIKey, flagAPIEmail)
 
 		if c.Bool("all") {
 			zones, err := dns.Zones()
 			fatalIfErr(err)
 
-			for _, zone := range zones {
+			for id, domain := range zones {
 				if debugFlag {
-					fmt.Println(zone)
+					fmt.Println(id, domain)
 				}
-
-				domain := strings.Split(zone, ",")[1]
 
 				table, err := dns.TableFor(domain)
 				fatalIfErr(err)

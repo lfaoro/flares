@@ -3,8 +3,9 @@
 Flares is a CloudFlare DNS backup tool, it dumps your DNS table to the screen or exports it as BIND formatted zone 
 files.
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
+[![BSD License](https://img.shields.io/badge/license-BSD-blue.svg?style=flat)](LICENSE) 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_shield)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
 
 ## Quick Start
 
