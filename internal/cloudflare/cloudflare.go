@@ -50,43 +50,58 @@ func (cf Cloudflare) TableFor(domain string) ([]byte, error) {
 	return cf.tableFor(domain)
 }
 
+// Zones returns a map(ID:domain) of all the zones available in your
+// CloudFlare account.
+//
 // ref: https://api.cloudflare.com/#zone-list-zones
 func (cf Cloudflare) Zones() (map[string]string, error) {
-	endpoint := cf.API + "/zones"
-	u, err := url.Parse(endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	v := url.Values{}
-	v.Add("per_page", "50")
-	u.RawQuery = v.Encode()
-
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	cf.setAuthHeaders(req)
-
-	res, err := cf.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	data := response{}
-	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-
-	if !data.Success {
-		return nil, errors.New(data.Errors[0].Message)
-	}
-
 	var result = map[string]string{}
-	for _, res := range data.Result {
-		result[res.ID] = res.Name
+	var count = 1
+
+	for {
+		endpoint := cf.API + "/zones"
+		u, err := url.Parse(endpoint)
+		if err != nil {
+			return nil, err
+		}
+
+		v := url.Values{}
+		v.Add("per_page", "50")
+		v.Add("page", string(count))
+		u.RawQuery = v.Encode()
+
+		req, err := http.NewRequest("GET", u.String(), nil)
+		if err != nil {
+			return nil, err
+		}
+
+		cf.setAuthHeaders(req)
+
+		res, err := cf.Client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer res.Body.Close()
+
+		data := response{}
+		if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
+			return nil, err
+		}
+
+		if !data.Success {
+			return nil, errors.New(data.Errors[0].Message)
+		}
+
+		for _, res := range data.Result {
+			result[res.ID] = res.Name
+		}
+
+		pages := data.ResultInfo.TotalCount / data.ResultInfo.PerPage
+		if count < pages {
+			count++
+			continue
+		}
+		break
 	}
 
 	return result, nil
@@ -118,7 +133,6 @@ func (cf Cloudflare) tableFor(domain string) ([]byte, error) {
 	}
 	return body, nil
 }
-
 
 func (cf Cloudflare) zoneIDFor(domain string) (string, error) {
 	endpoint := cf.API + "/zones"
