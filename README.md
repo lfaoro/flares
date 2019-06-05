@@ -32,7 +32,7 @@ brew install lfaoro/tap/flares
 
 ### Linux/BSD
 ```bash
-curl github.com/lfaoro/flares/install.sh | bash
+curl https://raw.githubusercontent.com/lfaoro/flares/master/install.sh | bash
 ```
 
 ### Developers
