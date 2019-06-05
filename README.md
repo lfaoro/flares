@@ -30,9 +30,9 @@ lfaoro/flares domain1.tld domain2.tld
 brew install lfaoro/tap/flares
 ```
 
-### Linux (soon)
+### Linux/BSD
 ```bash
-curl apionic.com/flares.sh | bash
+curl github.com/lfaoro/flares/install.sh | bash
 ```
 
 ### Developers

@@ -25,6 +25,9 @@ reltest:
 	cd cmd/flares && \
 	goreleaser release --snapshot --rm-dist --skip-publish --config=../../.goreleaser.yml
 
+installer:
+	godownloader --repo=lfaoro/flares > ./install.sh
+
 dep:
 	go mod init || :
 	go mod tidy
