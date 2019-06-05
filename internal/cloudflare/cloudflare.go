@@ -72,8 +72,6 @@ func (cf Cloudflare) Zones() (map[string]string, error) {
 		v.Add("page", strconv.Itoa(count))
 		u.RawQuery = v.Encode()
 
-		fmt.Println(u.String())
-
 		req, err := http.NewRequest("GET", u.String(), nil)
 		if err != nil {
 			return nil, errors.Wrap(err, "cloudflare:")
