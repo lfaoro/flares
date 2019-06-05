@@ -104,11 +104,16 @@ func main() {
 			wg := sync.WaitGroup{}
 			for id, domain := range zones {
 				if debugFlag {
-					fmt.Println(id, domain)
+					fmt.Printf("ID: %s: domain: %s\n", id, domain)
 				}
 
 				wg.Add(1)
-				go func() {
+				go func(domain string) {
+				if debugFlag {
+					fmt.Println("closure domain:", domain)
+					wg.Done()
+					return
+				}
 					table, err := dns.TableFor(domain)
 					fatalIfErr(err)
 
@@ -119,8 +124,7 @@ func main() {
 					}
 
 					wg.Done()
-				}()
-
+				}(domain)
 			}
 			wg.Wait()
 
