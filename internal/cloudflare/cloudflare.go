@@ -8,7 +8,6 @@ package cloudflare
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -57,8 +56,8 @@ func (cf Cloudflare) TableFor(domain string) ([]byte, error) {
 // ref: https://api.cloudflare.com/#zone-list-zones
 func (cf Cloudflare) Zones() (map[string]string, error) {
 	var result = map[string]string{}
-	var count = 1
 
+	var count = 1
 	for {
 		endpoint := cf.API + "/zones"
 		u, err := url.Parse(endpoint)
@@ -165,7 +164,6 @@ func (cf Cloudflare) zoneIDFor(domain string) (string, error) {
 		return "", err
 	}
 	if !response.Success {
-		fmt.Println("DEBUG:", response.Errors)
 		return "", errors.New(response.Errors[0].Message)
 	}
 	if len(response.Result) == 0 {

@@ -20,6 +20,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
@@ -96,21 +97,28 @@ func main() {
 			zones, err := dns.Zones()
 			fatalIfErr(err)
 
+			wg := sync.WaitGroup{}
 			for id, domain := range zones {
 				if debugFlag {
 					fmt.Println(id, domain)
 				}
 
-				table, err := dns.TableFor(domain)
-				fatalIfErr(err)
+				wg.Add(1)
+				go func() {
+					table, err := dns.TableFor(domain)
+					fatalIfErr(err)
 
-				if c.Bool("export") {
-					export(domain, table)
-					continue
-				}
+					if c.Bool("export") {
+						export(domain, table)
+					} else {
+						fmt.Println(string(table))
+					}
 
-				fmt.Println(string(table))
+					wg.Done()
+				}()
+
 			}
+			wg.Wait()
 
 			return nil
 		}
