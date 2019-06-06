@@ -110,7 +110,7 @@ func main() {
 				wg.Add(1)
 				go func(domain string) {
 					if debugFlag {
-						fmt.Println("closure domain:", domain)
+						fmt.Println("domain:", domain)
 						wg.Done()
 						return
 					}
@@ -127,8 +127,9 @@ func main() {
 					wg.Done()
 				}(domain)
 
-				wg.Wait()
 			}
+
+			wg.Wait()
 
 			return nil
 		}
