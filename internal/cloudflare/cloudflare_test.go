@@ -44,13 +44,13 @@ func TestNew(t *testing.T) {
 		},
 	}
 	t.Run("NewClientApiEmpty", func(t *testing.T) {
-		assert.PanicsWithValue(t, "cloudflare: missing required AuthKey, AuthEmail", func() { New("", "email") })
+		assert.PanicsWithValue(t, errNoAuthorization, func() { New("", "email") })
 	})
 	t.Run("NewClientEmailEmpty", func(t *testing.T) {
-		assert.PanicsWithValue(t, "cloudflare: missing required AuthKey, AuthEmail", func() { New("api", "") })
+		assert.PanicsWithValue(t, errNoAuthorization, func() { New("api", "") })
 	})
 	t.Run("NewClientWithApiAndEmailEmpty", func(t *testing.T) {
-		assert.PanicsWithValue(t, "cloudflare: missing required AuthKey, AuthEmail", func() { New("", "") })
+		assert.PanicsWithValue(t, errNoAuthorization, func() { New("", "") })
 	})
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
