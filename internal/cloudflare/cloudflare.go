@@ -30,6 +30,7 @@ type Cloudflare struct {
 	Client    http.Client
 }
 
+// New returns a Cloudflare client
 func New(apiKey, apiEmail string) Cloudflare {
 	if apiKey == "" || apiEmail == "" {
 		panic(errNoAuthorization)
@@ -39,7 +40,7 @@ func New(apiKey, apiEmail string) Cloudflare {
 		AuthKey:   apiKey,
 		AuthEmail: apiEmail,
 		Client: http.Client{
-			Timeout: time.Second * 5,
+			Timeout: time.Second * 30,
 		},
 	}
 	return client
