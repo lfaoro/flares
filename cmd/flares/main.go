@@ -90,7 +90,7 @@ func main() {
 		if flagAPIKey == "" || flagAPIEmail == "" {
 			return errors.New(
 				"provide --key & --email flags\n" +
-					"or $CF_API_EMAIL & $CF_API_EMAIL" + " ENV variables\n" +
+					"or $CF_API_KEY & $CF_API_EMAIL" + " ENV variables\n" +
 					"in order to access CloudFlare.\n\n" +
 					"GOTO: https://dash.cloudflare.com/profile -> Global API Key -> View")
 		}
