@@ -1,9 +1,7 @@
 APP ?= "./cmd/flares"
-
 VERSION ?= 1.0.0
 EPOCH ?= 1
-MAINTAINER ?= "Community"
-
+MAINTAINER ?= "The Flares Developers"
 LDFLAGS += -X "main.date=$(shell date '+%Y-%m-%d %I:%M:%S %Z')"
 
 install:

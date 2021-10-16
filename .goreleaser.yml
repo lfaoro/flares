@@ -8,54 +8,52 @@ builds:
       - linux
       - freebsd
     goarch:
-      - 386
       - amd64
-      - arm64
 
 checksum:
-  name_template: 'checksums.txt'
-sign:
-  artifacts: checksum
+  name_template: "checksums.txt"
+signs:
+  - artifacts: checksum
 snapshot:
   name_template: "{{ .Tag }}"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^vendor:'
-      - '^refactor:'
+      - "^docs:"
+      - "^test:"
+      - "^vendor:"
+      - "^refactor:"
 
-brew:
-  # Repository to push the tap to.
-  github:
-    owner: lfaoro
-    name: tap
+brews:
+  - # Repository to push the tap to.
+    tap:
+      owner: lfaoro
+      name: tap
 
-  # Git author used to commit to the repository.
-  # Defaults are shown.
-  commit_author:
-    name: Leonardo Faoro
-    email: lfaoro@gmail.com
+    # Git author used to commit to the repository.
+    # Defaults are shown.
+    commit_author:
+      name: Leonardo Faoro
+      email: lfaoro@gmail.com
 
-  # Your app's homepage.
-  # Default is empty.
-  homepage: "https://github.com/lfaoro/flares"
+    # Your app's homepage.
+    # Default is empty.
+    homepage: "https://github.com/lfaoro/flares"
 
-  # Your app's description.
-  # Default is empty.
-  description: "Flares is a CloudFlare DNS backup tool"
+    # Your app's description.
+    # Default is empty.
+    description: "Flares is a CloudFlare DNS backup tool"
 
-  # Setting this will prevent goreleaser to actually try to commit the updated
-  # formula - instead, the formula file will be stored on the dist folder only,
-  # leaving the responsibility of publishing it to the user.
-  # If set to auto, the release will not be uploaded to the homebrew tap
-  # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
-  # Default is false.
-  skip_upload: false
+    # Setting this will prevent goreleaser to actually try to commit the updated
+    # formula - instead, the formula file will be stored on the dist folder only,
+    # leaving the responsibility of publishing it to the user.
+    # If set to auto, the release will not be uploaded to the homebrew tap
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    # Default is false.
+    skip_upload: false
 
-  # So you can `brew test` your formula.
-  # Default is empty.
-  test: |
-    system "#{bin}/flares --version"
+    # So you can `brew test` your formula.
+    # Default is empty.
+    test: |
+      system "#{bin}/flares --version"
