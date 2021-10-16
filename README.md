@@ -16,10 +16,14 @@ files.
 
 ### Docker
 ```bash
-# Fetch your CloudFlare API key from here:
-# https://dash.cloudflare.com/profile/api-tokens -> Create Token with Zone.DNS permission
+# Fetch your CloudFlare API token from here:
+# https://dash.cloudflare.com/profile/api-tokens
+# -> Create Token
+# -> Edit zone DNS
+# -> Permission: read
+# -> Zone resources: Include -> All zones
 
-$ export CF_API_TOKEN=abcdef1234567890
+$ export CF_API_TOKEN="KClp4y8BgD2LQiz2..."
 
 $ docker run -it --rm \
 -e CF_API_TOKEN="$CF_API_TOKEN" \
