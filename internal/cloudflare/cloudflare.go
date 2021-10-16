@@ -9,6 +9,7 @@ package cloudflare
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -19,24 +20,24 @@ import (
 
 const (
 	errDomainNotFound  = "cloudflare: domain not found"
-	errNoAuthorization = "cloudflare: missing required AuthKey, AuthEmail"
+	errNoAuthorization = "cloudflare: missing required API token ($ export CF_API_TOKEN=\"\")"
 )
 
 // Cloudflare sets up authorization to the API.
 type Cloudflare struct {
-	API      string
-	ApiToken string
-	Client   http.Client
+	API    string
+	Token  string
+	Client http.Client
 }
 
 // New returns a Cloudflare client
-func New(apiToken string) Cloudflare {
-	if apiToken == "" {
-		panic(errNoAuthorization)
+func New(token string) Cloudflare {
+	if token == "" {
+		log.Fatal(errNoAuthorization)
 	}
 	client := Cloudflare{
-		API:      "https://api.cloudflare.com/client/v4",
-		ApiToken: apiToken,
+		API:   "https://api.cloudflare.com/client/v4",
+		Token: token,
 		Client: http.Client{
 			Timeout: time.Second * 30,
 		},
@@ -172,7 +173,7 @@ func (cf Cloudflare) zoneIDFor(domain string) (string, error) {
 }
 
 func (cf Cloudflare) setAuthHeaders(req *http.Request) {
-	req.Header.Add("Authorization", "Bearer "+cf.ApiToken)
+	req.Header.Add("Authorization", "Bearer "+cf.Token)
 }
 
 type response struct {
