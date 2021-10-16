@@ -32,8 +32,8 @@ func TestNew(t *testing.T) {
 				"token",
 			},
 			Cloudflare{
-				API:      "https://api.cloudflare.com/client/v4",
-				ApiToken: "token",
+				API:   "https://api.cloudflare.com/client/v4",
+				Token: "token",
 				Client: http.Client{
 					Timeout: time.Second * 30,
 				},

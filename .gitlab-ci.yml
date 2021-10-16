@@ -10,16 +10,20 @@ backup:
   stage: build
   retry: 2
   script: |
-    # CloudFlare API key is here:
-    # https://dash.cloudflare.com/profile -> Global API Key -> View
+    # Fetch your CloudFlare API token from here:
+    # https://dash.cloudflare.com/profile/api-tokens
+    # -> Create Token
+    # -> Edit zone DNS
+    # -> Permission: read
+    # -> Zone resources: Include -> All zones
+
     docker run -t --rm \
-    -e CF_API_KEY="$CF_API_KEY" \
-    -e CF_API_EMAIL="$CF_API_EMAIL" \
-    lfaoro/flares --all > dns-backup-bind.txt
+    -e CF_API_TOKEN="$CF_API_TOKEN" \
+    lfaoro/flares --all > dns_backup.bind
   artifacts:
     untracked: true
     # uncomment if needed (default is forever on gitlab.com)
     # expire_in: 4 week
-    name: "backup-${date}"
+    name: "bck-${date}"
     paths:
-     - dns-backup-bind.txt
+      - dns_backup.bind
