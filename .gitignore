@@ -5,3 +5,4 @@ idea.md
 .vscode/
 .idea/
 dist/
+vendor/
