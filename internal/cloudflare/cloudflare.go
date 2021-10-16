@@ -24,21 +24,19 @@ const (
 
 // Cloudflare sets up authorization to the API.
 type Cloudflare struct {
-	API       string
-	AuthKey   string
-	AuthEmail string
-	Client    http.Client
+	API      string
+	ApiToken string
+	Client   http.Client
 }
 
 // New returns a Cloudflare client
-func New(apiKey, apiEmail string) Cloudflare {
-	if apiKey == "" || apiEmail == "" {
+func New(apiToken string) Cloudflare {
+	if apiToken == "" {
 		panic(errNoAuthorization)
 	}
 	client := Cloudflare{
-		API:       "https://api.cloudflare.com/client/v4",
-		AuthKey:   apiKey,
-		AuthEmail: apiEmail,
+		API:      "https://api.cloudflare.com/client/v4",
+		ApiToken: apiToken,
 		Client: http.Client{
 			Timeout: time.Second * 30,
 		},
@@ -174,8 +172,7 @@ func (cf Cloudflare) zoneIDFor(domain string) (string, error) {
 }
 
 func (cf Cloudflare) setAuthHeaders(req *http.Request) {
-	req.Header.Add("X-Auth-Key", cf.AuthKey)
-	req.Header.Add("X-Auth-Email", cf.AuthEmail)
+	req.Header.Add("Authorization", "Bearer "+cf.ApiToken)
 }
 
 type response struct {

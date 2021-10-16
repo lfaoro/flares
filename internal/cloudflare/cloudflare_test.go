@@ -19,8 +19,7 @@ import (
 
 func TestNew(t *testing.T) {
 	type args struct {
-		apiKey   string
-		apiEmail string
+		apiToken string
 	}
 	tests := []struct {
 		name string
@@ -30,31 +29,23 @@ func TestNew(t *testing.T) {
 		{
 			"NewCloudFlareClient",
 			args{
-				"key",
-				"email",
+				"token",
 			},
 			Cloudflare{
-				API:       "https://api.cloudflare.com/client/v4",
-				AuthKey:   "key",
-				AuthEmail: "email",
+				API:      "https://api.cloudflare.com/client/v4",
+				ApiToken: "token",
 				Client: http.Client{
 					Timeout: time.Second * 30,
 				},
 			},
 		},
 	}
-	t.Run("NewClientApiEmpty", func(t *testing.T) {
-		assert.PanicsWithValue(t, errNoAuthorization, func() { New("", "email") })
-	})
-	t.Run("NewClientEmailEmpty", func(t *testing.T) {
-		assert.PanicsWithValue(t, errNoAuthorization, func() { New("api", "") })
-	})
-	t.Run("NewClientWithApiAndEmailEmpty", func(t *testing.T) {
-		assert.PanicsWithValue(t, errNoAuthorization, func() { New("", "") })
+	t.Run("NewClientTokenEmpty", func(t *testing.T) {
+		assert.PanicsWithValue(t, errNoAuthorization, func() { New("") })
 	})
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := New(tt.args.apiKey, tt.args.apiEmail); !reflect.DeepEqual(got, tt.want) {
+			if got := New(tt.args.apiToken); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got %v, want %v", got, tt.want)
 			}
 		})
@@ -64,13 +55,13 @@ func TestNew(t *testing.T) {
 func TestCloudflare_Zones(t *testing.T) {
 
 	// fail case
-	cc := New(os.Getenv("CF_API_KEY"), "fake@email.com")
-	zones, err := cc.Zones()
+	cc := New("fake")
+	_, err := cc.Zones()
 	assert.NotNil(t, err)
 
-	c := New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
-	zones, err = c.Zones()
-	assert.Nil(t, err)
+	c := New(os.Getenv("CF_API_TOKEN"))
+	zones, err2 := c.Zones()
+	assert.Nil(t, err2)
 
 	fmt.Println("zones", zones)
 

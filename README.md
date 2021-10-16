@@ -1,9 +1,9 @@
 # Flares 🔥
 
-Flares is a CloudFlare DNS backup tool, it dumps your DNS table to the screen or exports it as BIND formatted zone 
+Flares is a CloudFlare DNS backup tool, it dumps your DNS table to the screen or exports it as BIND formatted zone
 files.
 
-[![BSD License](https://img.shields.io/badge/license-BSD-blue.svg?style=flat)](LICENSE) 
+[![BSD License](https://img.shields.io/badge/license-BSD-blue.svg?style=flat)](LICENSE)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_shield)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
 
@@ -17,14 +17,12 @@ files.
 ### Docker
 ```bash
 # Fetch your CloudFlare API key from here:
-# https://dash.cloudflare.com/profile -> Global API Key -> View
+# https://dash.cloudflare.com/profile/api-tokens -> Create Token with Zone.DNS permission
 
-$ export CF_API_KEY=abcdef1234567890
-$ export CF_API_EMAIL=someone@example.com
+$ export CF_API_TOKEN=abcdef1234567890
 
 $ docker run -it --rm \
--e CF_API_KEY="$CF_API_KEY" \
--e CF_API_EMAIL="$CF_API_EMAIL" \
+-e CF_API_TOKEN="$CF_API_TOKEN" \
 lfaoro/flares domain1.tld domain2.tld
 ```
 
@@ -60,7 +58,7 @@ $ flares domain1.tld
 ;; Exported:   2019-06-03 06:31:29
 ...continued
 
-$ flares --export domain1.tld domain2.tld 
+$ flares --export domain1.tld domain2.tld
 BIND table for domain1.tld successfully exported
 BIND table for domain2.tld successfully exported
 $ ls
@@ -84,4 +82,3 @@ domain1.tld domain2.tld
 - Commit your changes `git commit -am 'Add my feature'`
 - Push to the branch `git push origin my-new-feature`
 - Create a new pull request against the master branch
-
