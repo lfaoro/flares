@@ -57,7 +57,7 @@ func (cf Cloudflare) TableFor(domain string) ([]byte, error) {
 func (cf Cloudflare) Zones() (map[string]string, error) {
 	var result = map[string]string{}
 
-	var count = 1
+	var page = 1
 	for {
 		endpoint := cf.API + "/zones"
 		u, err := url.Parse(endpoint)
@@ -68,7 +68,7 @@ func (cf Cloudflare) Zones() (map[string]string, error) {
 		v := url.Values{}
 		maxPerPageValue := 50
 		v.Add("per_page", strconv.Itoa(maxPerPageValue))
-		v.Add("page", strconv.Itoa(count))
+		v.Add("page", strconv.Itoa(page))
 		u.RawQuery = v.Encode()
 
 		req, err := http.NewRequest("GET", u.String(), nil)
@@ -97,9 +97,8 @@ func (cf Cloudflare) Zones() (map[string]string, error) {
 			result[res.ID] = res.Name
 		}
 
-		pages := data.ResultInfo.TotalCount / maxPerPageValue
-		if count < pages {
-			count++
+		if page < data.ResultInfo.TotalPages {
+			page++
 			continue
 		}
 		break
@@ -233,5 +232,6 @@ type response struct {
 		PerPage    int `json:"per_page"`
 		Count      int `json:"count"`
 		TotalCount int `json:"total_count"`
+		TotalPages int `json:"total_pages"`
 	} `json:"result_info"`
 }
