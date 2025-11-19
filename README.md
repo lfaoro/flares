@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=lfaoro&project=flares&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 # Flares 🔥
 
 Flares is a CloudFlare DNS backup tool, it dumps your DNS table to the screen or exports it as BIND formatted zone
