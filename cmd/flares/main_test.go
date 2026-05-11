@@ -15,7 +15,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 )
+
+func TestMain(m *testing.M) {
+	goleak.VerifyTestMain(m)
+}
 
 func captureOutput(fn func()) (string, string) {
 	stdoutR, stdoutW, _ := os.Pipe()
@@ -270,4 +275,144 @@ func FuzzWriteFile(f *testing.F) {
 		_, err = os.Stat(filepath.Join(tmpDir, domain))
 		require.NoError(t, err, "file should exist for domain=%q", domain)
 	})
+}
+
+func TestCLI_DebugShow(t *testing.T) {
+	t.Setenv("CLOUDFLARE_API_TOKEN", "test-token")
+
+	stdout, stderr := captureOutput(func() {
+		err := runApp("flares", "--debug", "show", "example.com")
+		assert.NoError(t, err)
+	})
+	assert.Contains(t, stdout, "domain: example.com")
+	assert.Empty(t, stderr)
+}
+
+func TestCLI_DebugExport(t *testing.T) {
+	t.Setenv("CLOUDFLARE_API_TOKEN", "test-token")
+	tmpDir := t.TempDir()
+	t.Chdir(tmpDir)
+
+	stdout, stderr := captureOutput(func() {
+		err := runApp("flares", "--debug", "export", "example.com")
+		assert.NoError(t, err)
+	})
+	assert.Contains(t, stdout, "domain: example.com")
+	assert.Empty(t, stderr)
+}
+
+func TestWriteFile_InvalidDomain(t *testing.T) {
+	tests := []struct {
+		name   string
+		domain string
+	}{
+		{name: "empty", domain: ""},
+		{name: "dot", domain: "."},
+		{name: "dot dot", domain: ".."},
+		{name: "slash", domain: "foo/bar"},
+		{name: "backslash", domain: "foo\\bar"},
+		{name: "path traversal", domain: "foo/../bar"},
+		{name: "dot dot prefix", domain: "../../etc/passwd"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmpDir := t.TempDir()
+			t.Chdir(tmpDir)
+
+			err := writeFile(tt.domain, []byte("data"))
+			require.Error(t, err)
+		})
+	}
+}
+
+func TestCLI_ShowAll(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/zones", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("name") == "example.com" {
+			respondZoneResp(w, "z1", "example.com")
+			return
+		}
+		if r.URL.Query().Get("name") == "test.org" {
+			respondZoneResp(w, "z2", "test.org")
+			return
+		}
+		resp := map[string]any{
+			"success": true,
+			"result": []map[string]any{
+				{"id": "z1", "name": "example.com"},
+				{"id": "z2", "name": "test.org"},
+			},
+			"result_info": map[string]int{"page": 1, "total_pages": 1},
+		}
+		json.NewEncoder(w).Encode(resp)
+	})
+	mux.HandleFunc("/zones/z1/dns_records/export", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("example.com. 300 IN A 1.2.3.4\n"))
+	})
+	mux.HandleFunc("/zones/z2/dns_records/export", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("test.org. 300 IN A 5.6.7.8\n"))
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	stdout, _ := captureOutput(func() {
+		err := runApp("flares", "--token", "test", "--api-url", srv.URL, "show", "--all")
+		assert.NoError(t, err)
+	})
+	assert.Contains(t, stdout, "1.2.3.4")
+	assert.Contains(t, stdout, "5.6.7.8")
+}
+
+func TestCLI_ExportAll(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/zones", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("name") == "example.com" {
+			respondZoneResp(w, "z1", "example.com")
+			return
+		}
+		if r.URL.Query().Get("name") == "test.org" {
+			respondZoneResp(w, "z2", "test.org")
+			return
+		}
+		resp := map[string]any{
+			"success": true,
+			"result": []map[string]any{
+				{"id": "z1", "name": "example.com"},
+				{"id": "z2", "name": "test.org"},
+			},
+			"result_info": map[string]int{"page": 1, "total_pages": 1},
+		}
+		json.NewEncoder(w).Encode(resp)
+	})
+	mux.HandleFunc("/zones/z1/dns_records/export", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("example.com. 300 IN A 1.2.3.4\n"))
+	})
+	mux.HandleFunc("/zones/z2/dns_records/export", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("test.org. 300 IN A 5.6.7.8\n"))
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	tmpDir := t.TempDir()
+	t.Chdir(tmpDir)
+
+	stdout, _ := captureOutput(func() {
+		err := runApp("flares", "--token", "test", "--api-url", srv.URL, "export", "--all")
+		assert.NoError(t, err)
+	})
+	assert.Contains(t, stdout, "BIND data for example.com successfully exported")
+	assert.Contains(t, stdout, "BIND data for test.org successfully exported")
+
+	data1, err := os.ReadFile(filepath.Join(tmpDir, "example.com"))
+	require.NoError(t, err)
+	assert.Contains(t, string(data1), "1.2.3.4")
+
+	data2, err := os.ReadFile(filepath.Join(tmpDir, "test.org"))
+	require.NoError(t, err)
+	assert.Contains(t, string(data2), "5.6.7.8")
 }
