@@ -3,8 +3,12 @@ module github.com/lfaoro/flares
 go 1.26
 
 require (
-	github.com/stretchr/testify v1.11.1
-	github.com/urfave/cli/v3 v3.8.0
+	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pkg/errors v0.9.1
+	github.com/stretchr/testify v1.7.0
+	github.com/urfave/cli v1.22.5
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
