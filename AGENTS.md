@@ -1,8 +1,10 @@
 # Flares — Agent Guide
 
-**Module**: `github.com/lfaoro/flares` · **Go**: 1.26 · **CLI**: `urfave/cli/v2`
+**Module**: `github.com/lfaoro/flares` · **Go**: 1.26.3 · **CLI**: `urfave/cli/v3`
 
 See also [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide (agent usage, pull requests, commit conventions).
+
+> **Before every push**: update [CHANGES.md](CHANGES.md) with unreleased changes and keep AGENTS.md in sync with the current codebase. These files are the contract between agents and maintainers.
 
 ## Commands
 
@@ -30,29 +32,38 @@ Pre-push hook auto-installed via `make hooks`. It runs `make check` (go mod tidy
 ## Testing Patterns
 
 **CLI tests** (`cmd/flares/main_test.go`):
-- Call `newApp().Run(args)` — not `main()`, avoids `os.Exit`
+- Call `runApp(args...)` which calls `newCmd().Run()` — not `main()`, avoids `os.Exit`
 - `captureOutput()` helper replaces global `os.Stdout`/`os.Stderr` — **cannot** use `t.Parallel()`
 - Use `t.Setenv("CLOUDFLARE_API_TOKEN", "")` to test missing token
+- `TestMain` runs `goleak.VerifyTestMain(m)` for goroutine leak detection
+- Use `respondZoneResp(w, id, name)` helper for mock zone responses
+- `FuzzWriteFile` fuzzes the `writeFile` filename validation invariant
 
 **Cloudflare tests** (`internal/cloudflare/cloudflare_test.go`):
-- Each test creates its own `httptest.NewServer` with a fresh `http.NewServeMux`
+- **Table-driven**: `TestZones` (9 subtests) and `TestExport` (5 subtests) with named subtests
+- Each subtest creates its own `httptest.NewServer` with a fresh `http.NewServeMux`
 - Client constructed manually: `&Client{api: srv.URL, token: "...", http: http.DefaultClient}`
-- All tests use `t.Parallel()` and `t.Context()` (Go 1.24+)
+- All subtests use `t.Parallel()` and `t.Context()` (Go 1.24+)
 - Mock both `/zones` and `/zones/{id}/dns_records/export` endpoints on same mux
+- Error paths tested: 401, 403, 429, 500, bad JSON, network errors, domain not found
 
 ## Architecture
 
 ```
-cmd/flares/main.go          → newApp(), cli.App with subcommands, signal handling
+cmd/flares/main.go          → newCmd(), cli.Command with subcommands, signal handling
 internal/cloudflare/         → Client{api, token, http}, New(token) (*Client, error)
   .Zones(ctx)                → GET /zones?per_page=50&page=N, paginated
   .Export(ctx, domain)       → GET /zones/{id}/dns_records/export, returns BIND text
-  do(ctx, method, path, q)   → shared request helper: auth, encode, decode, error handling
+  do(ctx, method, path, q)   → JSON API helper: newRequest → do → status check → decode
+  doRaw(ctx, method, path, q)→ Raw API helper: newRequest → do → status check → bytes (for Export)
+  newRequest(...)             → shared request builder: url parse, auth header, context
 ```
 
 - `do()` checks 401/403/429/all non-2xx explicitly before JSON decode
+- `doRaw()` checks that status is 200 before returning raw bytes
 - `export --all` uses semaphore (`maxConcurrent=10`, configurable via `--threads`) to limit concurrent API calls
 - `show --output json` wraps BIND output in `map[string]string` JSON
+- `writeFile` rejects path traversal: empty, `.`, `..`, `/`, `\` in domain names
 
 ## Code Conventions
 
@@ -61,6 +72,15 @@ internal/cloudflare/         → Client{api, token, http}, New(token) (*Client, 
 - `os.ReadFile`/`os.WriteFile` — no `io/ioutil`
 - Return errors through CLI framework — no `os.Exit` in command handlers
 - `main()` wraps via `os.Exit(run())` so `defer cancel()` runs before exit
+
+## Security
+
+- `writeFile` validates domain names before writing (path traversal prevention)
+- `--api-url` is hidden and warns on stderr when overridden
+- `gosec` runs in CI via `security.yml`
+- `govulncheck` runs in CI via `security.yml`
+- Fuzz test verifies `writeFile` invariant: any accepted name writes inside the intended directory
+- Tests cover all `do()` error paths: 401, 403, 429, 500, bad JSON, network errors
 
 ## Release
 

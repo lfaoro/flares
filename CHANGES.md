@@ -41,7 +41,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `shell.nix` for Nix dev environment
 - `mise.toml` for mise tool versions
 - `CHANGES.md` for tracking notable changes
-- Makefile targets: `build-all`, `fmt`, `vet`, `lint`, `dev`, `mise`, `test`
+- Makefile targets: `build-all`, `fmt`, `vet`, `lint`, `dev`, `mise`, `test`, `check`, `hooks`
+- Pre-push hook (`.githooks/pre-push`) that runs `make check`
+- `DefaultBaseURL` exported constant in cloudflare package
+- `doRaw()` helper for non-JSON API responses
+- `newRequest()` helper to share request-building between `do()` and `doRaw()`
+- Path traversal protection in `writeFile` (reject `..`, `/`, `\`, `.`, empty)
+- Stderr warning when `--api-url` differs from default (testing-only flag)
+- `go.uber.org/goleak` goroutine leak detection in CLI tests
+- `FuzzWriteFile` fuzz test for path traversal edge cases
+- Table-driven `TestZones` (9 subtests) and `TestExport` (5 subtests)
+- Tests for HTTP 401, 429, 500, bad JSON, and network errors
+- `TestWriteFile_InvalidDomain` (7 subtests for invalid filenames)
+- `TestCLI_DebugShow` / `TestCLI_DebugExport` for `--debug` path
+- `TestCLI_ShowAll` / `TestCLI_ExportAll` for concurrent multi-zone export
+- `ExampleClient_Export` executable godoc example
 
 ### Removed
 
