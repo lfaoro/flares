@@ -126,6 +126,7 @@ winget:
 dockers_v2:
   - images:
       - lfaoro/flares
+      - ghcr.io/lfaoro/flares
     tags:
       - "{{ .Version }}"
       - "{{ if not .IsNightly }}latest{{ end }}"
