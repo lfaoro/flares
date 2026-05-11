@@ -1,3 +1,5 @@
+version: "2"
+
 linters:
   enable:
     - govet
@@ -27,7 +29,6 @@ linters:
     - goconst
     - nolintlint
     - gofmt
-
   disable:
     - lll
     - wrapcheck
@@ -36,21 +37,19 @@ linters:
     - unparam
     - testpackage
     - goimports
+  settings:
+    errcheck:
+      check-type-assertions: true
+    goconst:
+      min-len: 3
+      min-occurrences: 4
+    nolintlint:
+      require-explanation: true
+      require-specific: true
 
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-  funlen:
-    lines: 120
-    statements: 80
-  goconst:
-    min-len: 3
-    min-occurrences: 4
-  gocyclo:
-    min-complexity: 13
-  nolintlint:
-    require-explanation: true
-    require-specific: true
+  exclusions:
+    paths:
+      - _test\.go
 
 run:
   concurrency: 4
@@ -60,11 +59,3 @@ run:
 issues:
   max-issues-per-linter: 0
   max-same-issues: 50
-  exclude-rules:
-    - path: _test\.go
-version: "2"
-
-linters:
-        - goconst
-        - errcheck
-        - paralleltest
