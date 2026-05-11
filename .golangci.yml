@@ -62,7 +62,9 @@ issues:
   max-same-issues: 50
   exclude-rules:
     - path: _test\.go
-      linters:
+version: "2"
+
+linters:
         - goconst
         - errcheck
         - paralleltest
