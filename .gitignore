@@ -6,3 +6,5 @@ idea.md
 .idea/
 dist/
 vendor/
+/flares
+/flares-*

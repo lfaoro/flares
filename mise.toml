@@ -1,0 +1,5 @@
+[tools]
+go = "1.26"
+golangci-lint = "latest"
+goreleaser = "2"
+"go:mvdan.cc/gofumpt" = "latest"

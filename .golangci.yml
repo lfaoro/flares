@@ -1,0 +1,68 @@
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - unused
+    - errcheck
+    - errorlint
+    - nilerr
+    - forcetypeassert
+    - copyloopvar
+    - durationcheck
+    - reassign
+    - gocritic
+    - revive
+    - gosec
+    - bodyclose
+    - noctx
+    - testifylint
+    - thelper
+    - usetesting
+    - paralleltest
+    - misspell
+    - predeclared
+    - errname
+    - unconvert
+    - ineffassign
+    - goconst
+    - nolintlint
+    - gofmt
+
+  disable:
+    - lll
+    - wrapcheck
+    - err113
+    - mnd
+    - unparam
+    - testpackage
+    - goimports
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+  funlen:
+    lines: 120
+    statements: 80
+  goconst:
+    min-len: 3
+    min-occurrences: 4
+  gocyclo:
+    min-complexity: 13
+  nolintlint:
+    require-explanation: true
+    require-specific: true
+
+run:
+  concurrency: 4
+  timeout: 5m
+  tests: true
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 50
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - goconst
+        - errcheck
+        - paralleltest
