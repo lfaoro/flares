@@ -1,5 +1,7 @@
+// Command flares is a Cloudflare DNS backup tool.
+// It exports DNS records as BIND-formatted zone files to stdout or disk.
+//
 // SPDX-License-Identifier: MIT
-
 package main
 
 import (

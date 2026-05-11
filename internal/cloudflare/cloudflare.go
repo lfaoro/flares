@@ -1,5 +1,7 @@
+// Package cloudflare provides a Client for the Cloudflare API v4.
+// It supports listing zones and exporting DNS records in BIND format.
+//
 // SPDX-License-Identifier: MIT
-
 package cloudflare
 
 import (
@@ -14,23 +16,28 @@ import (
 )
 
 const (
-	apiBaseURL   = "https://api.cloudflare.com/client/v4"
-	ErrNoToken   = simpleError("cloudflare: missing API token")
+	apiBaseURL = "https://api.cloudflare.com/client/v4"
+	// ErrNoToken is returned when no API token is provided.
+	ErrNoToken = simpleError("cloudflare: missing API token")
+	// ErrDomainNF is returned when a domain is not found in the account.
 	ErrDomainNF  = simpleError("cloudflare: domain not found")
 	perPage      = 50
 	requestTimut = 30 * time.Second
 )
 
+// simpleError is a trivial error type for sentinel errors.
 type simpleError string
 
 func (e simpleError) Error() string { return string(e) }
 
+// Client provides access to the Cloudflare API v4.
 type Client struct {
 	api   string
 	token string
 	http  *http.Client
 }
 
+// New returns a Cloudflare API client with the given API token.
 func New(token string) (*Client, error) {
 	if token == "" {
 		return nil, ErrNoToken
@@ -42,10 +49,12 @@ func New(token string) (*Client, error) {
 	}, nil
 }
 
+// SetBaseURL overrides the default API base URL. Used for testing with mock servers.
 func (c *Client) SetBaseURL(url string) {
 	c.api = url
 }
 
+// Zones returns a map of zone ID to domain name for all zones in the account.
 func (c *Client) Zones(ctx context.Context) (map[string]string, error) {
 	zones := map[string]string{}
 	page := 1
@@ -74,6 +83,7 @@ func (c *Client) Zones(ctx context.Context) (map[string]string, error) {
 	return zones, nil
 }
 
+// Export returns the BIND-format DNS records for a given domain.
 func (c *Client) Export(ctx context.Context, domain string) ([]byte, error) {
 	zoneID, err := c.zoneID(ctx, domain)
 	if err != nil {
@@ -91,7 +101,7 @@ func (c *Client) Export(ctx context.Context, domain string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("export do: %w", err)
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck // body already consumed
 
 	if res.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(res.Body)
@@ -141,7 +151,7 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 	if err != nil {
 		return fmt.Errorf("do: %w", err)
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck // body already consumed
 
 	raw, err := io.ReadAll(res.Body)
 	if err != nil {
