@@ -35,7 +35,6 @@ linters:
     - mnd
     - unparam
     - testpackage
-    - goimports
   settings:
     errcheck:
       check-type-assertions: true
@@ -62,3 +61,5 @@ issues:
 formatters:
   enable:
     - gofmt
+  disable:
+    - goimports
