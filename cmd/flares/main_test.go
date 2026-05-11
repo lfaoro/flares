@@ -45,6 +45,20 @@ func runApp(args ...string) error {
 	return cmd.Run(context.Background(), args)
 }
 
+func respondZoneResp(w http.ResponseWriter, id, name string) {
+	resp := map[string]any{
+		"success": true,
+		"result": []map[string]any{
+			{"id": id, "name": name},
+		},
+		"result_info": map[string]int{
+			"page":        1,
+			"total_pages": 1,
+		},
+	}
+	json.NewEncoder(w).Encode(resp)
+}
+
 func TestCLI_Help(t *testing.T) {
 	stdout, stderr := captureOutput(func() {
 		err := runApp("flares", "--help")
@@ -144,8 +158,7 @@ func TestCLI_ShowDomain(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/zones", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("name") == "example.com" {
-			resp := map[string]any{"success": true, "result": []map[string]any{{"id": "z1", "name": "example.com"}}, "result_info": map[string]int{"page": 1, "total_pages": 1}}
-			json.NewEncoder(w).Encode(resp)
+			respondZoneResp(w, "z1", "example.com")
 		}
 	})
 	mux.HandleFunc("/zones/z1/dns_records/export", func(w http.ResponseWriter, _ *http.Request) {
@@ -166,8 +179,7 @@ func TestCLI_ShowDomainJSON(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/zones", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("name") == "example.com" {
-			resp := map[string]any{"success": true, "result": []map[string]any{{"id": "z1", "name": "example.com"}}, "result_info": map[string]int{"page": 1, "total_pages": 1}}
-			json.NewEncoder(w).Encode(resp)
+			respondZoneResp(w, "z1", "example.com")
 		}
 	})
 	mux.HandleFunc("/zones/z1/dns_records/export", func(w http.ResponseWriter, _ *http.Request) {
@@ -188,8 +200,7 @@ func TestCLI_ExportDomain(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/zones", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("name") == "example.com" {
-			resp := map[string]any{"success": true, "result": []map[string]any{{"id": "z1", "name": "example.com"}}, "result_info": map[string]int{"page": 1, "total_pages": 1}}
-			json.NewEncoder(w).Encode(resp)
+			respondZoneResp(w, "z1", "example.com")
 		}
 	})
 	mux.HandleFunc("/zones/z1/dns_records/export", func(w http.ResponseWriter, _ *http.Request) {
@@ -237,4 +248,26 @@ func TestCLI_Zones(t *testing.T) {
 	assert.Contains(t, stdout, "example.com")
 	assert.Contains(t, stdout, "z2")
 	assert.Contains(t, stdout, "test.org")
+}
+
+func FuzzWriteFile(f *testing.F) {
+	f.Add("example.com")
+	f.Add("../../etc/passwd")
+	f.Add("foo/bar")
+	f.Add("")
+	f.Add("..")
+	f.Add("a/b")
+
+	f.Fuzz(func(t *testing.T, domain string) {
+		tmpDir := t.TempDir()
+		t.Chdir(tmpDir)
+
+		err := writeFile(domain, []byte("content"))
+		if err != nil {
+			return
+		}
+
+		_, err = os.Stat(filepath.Join(tmpDir, domain))
+		require.NoError(t, err, "file should exist for domain=%q", domain)
+	})
 }

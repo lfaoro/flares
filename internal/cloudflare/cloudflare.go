@@ -16,7 +16,8 @@ import (
 )
 
 const (
-	apiBaseURL = "https://api.cloudflare.com/client/v4"
+	// DefaultBaseURL is the default Cloudflare API v4 base URL.
+	DefaultBaseURL = "https://api.cloudflare.com/client/v4"
 	// ErrNoToken is returned when no API token is provided.
 	ErrNoToken = simpleError("cloudflare: missing API token")
 	// ErrDomainNF is returned when a domain is not found in the account.
@@ -43,7 +44,7 @@ func New(token string) (*Client, error) {
 		return nil, ErrNoToken
 	}
 	return &Client{
-		api:   apiBaseURL,
+		api:   DefaultBaseURL,
 		token: token,
 		http:  &http.Client{Timeout: requestTimut},
 	}, nil
@@ -91,28 +92,7 @@ func (c *Client) Export(ctx context.Context, domain string) ([]byte, error) {
 	}
 
 	endpoint := fmt.Sprintf("/zones/%s/dns_records/export", zoneID)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.api+endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("export request: %w", err)
-	}
-	req.Header.Set("Authorization", "Bearer "+c.token)
-
-	res, err := c.http.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("export do: %w", err)
-	}
-	defer res.Body.Close() //nolint:errcheck // body already consumed
-
-	if res.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(res.Body)
-		return nil, fmt.Errorf("export: status %d: %s", res.StatusCode, string(body))
-	}
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, fmt.Errorf("export read: %w", err)
-	}
-	return body, nil
+	return c.doRaw(ctx, http.MethodGet, endpoint, nil)
 }
 
 func (c *Client) zoneID(ctx context.Context, domain string) (string, error) {
@@ -133,19 +113,10 @@ func (c *Client) zoneID(ctx context.Context, domain string) (string, error) {
 }
 
 func (c *Client) do(ctx context.Context, method, path string, query url.Values, dest any) error {
-	u, err := url.Parse(c.api + path)
+	req, err := c.newRequest(ctx, method, path, query)
 	if err != nil {
-		return fmt.Errorf("parse url: %w", err)
+		return err
 	}
-	if query != nil {
-		u.RawQuery = query.Encode()
-	}
-
-	req, err := http.NewRequestWithContext(ctx, method, u.String(), nil)
-	if err != nil {
-		return fmt.Errorf("new request: %w", err)
-	}
-	req.Header.Set("Authorization", "Bearer "+c.token)
 
 	res, err := c.http.Do(req)
 	if err != nil {
@@ -158,13 +129,12 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 		return fmt.Errorf("read body: %w", err)
 	}
 
-	if res.StatusCode == http.StatusUnauthorized || res.StatusCode == http.StatusForbidden {
+	switch {
+	case res.StatusCode == http.StatusUnauthorized || res.StatusCode == http.StatusForbidden:
 		return fmt.Errorf("token rejected: check your API token has Zone.DNS read permission")
-	}
-	if res.StatusCode == http.StatusTooManyRequests {
+	case res.StatusCode == http.StatusTooManyRequests:
 		return fmt.Errorf("rate limited: %s", string(raw))
-	}
-	if res.StatusCode/100 != 2 {
+	case res.StatusCode/100 != 2:
 		return fmt.Errorf("unexpected status %d: %s", res.StatusCode, string(raw))
 	}
 
@@ -172,6 +142,47 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 		return fmt.Errorf("decode: %w", err)
 	}
 	return nil
+}
+
+func (c *Client) doRaw(ctx context.Context, method, path string, query url.Values) ([]byte, error) {
+	req, err := c.newRequest(ctx, method, path, query)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.http.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("do: %w", err)
+	}
+	defer res.Body.Close() //nolint:errcheck // body already consumed
+
+	raw, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read body: %w", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status %d: %s", res.StatusCode, string(raw))
+	}
+
+	return raw, nil
+}
+
+func (c *Client) newRequest(ctx context.Context, method, path string, query url.Values) (*http.Request, error) {
+	u, err := url.Parse(c.api + path)
+	if err != nil {
+		return nil, fmt.Errorf("parse url: %w", err)
+	}
+	if query != nil {
+		u.RawQuery = query.Encode()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("new request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+c.token)
+	return req, nil
 }
 
 type apiError struct {

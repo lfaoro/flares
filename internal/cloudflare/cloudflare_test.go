@@ -23,7 +23,7 @@ func TestNew_ValidToken(t *testing.T) {
 	c, err := New("valid-token")
 	require.NoError(t, err)
 	require.NotNil(t, c)
-	assert.Equal(t, apiBaseURL, c.api)
+	assert.Equal(t, DefaultBaseURL, c.api)
 	assert.Equal(t, "valid-token", c.token)
 }
 
@@ -68,7 +68,8 @@ func TestZones_MultiPage(t *testing.T) {
 		if page == "1" {
 			resp.Result = []zone{{ID: "z1", Name: "alpha.com"}}
 			resp.Info.Page = 1
-		} else {
+		}
+		if page == "2" {
 			resp.Result = []zone{{ID: "z2", Name: "beta.com"}}
 			resp.Info.Page = 2
 		}

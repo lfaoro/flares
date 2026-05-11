@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -54,7 +55,9 @@ func newCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:    "token",
 				Aliases: []string{"t"},
-				Usage:   "Cloudflare API `TOKEN` (create at https://dash.cloudflare.com/profile/api-tokens with Zone.DNS read permission)",
+				Usage: "Cloudflare API `TOKEN` " +
+					"(create at https://dash.cloudflare.com/profile/api-tokens " +
+					"with Zone.DNS read permission)",
 				Sources: cli.NewValueSourceChain(
 					cli.EnvVar("CLOUDFLARE_API_TOKEN"),
 					cli.EnvVar("CF_API_TOKEN"),
@@ -139,7 +142,8 @@ func clientFromCmd(cmd *cli.Command) (*cloudflare.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	if apiURL := cmd.String("api-url"); apiURL != "" {
+	if apiURL := cmd.String("api-url"); apiURL != "" && apiURL != cloudflare.DefaultBaseURL {
+		fmt.Fprintln(os.Stderr, "warning: using non-default API URL (--api-url is for testing only)")
 		cf.SetBaseURL(apiURL)
 	}
 	return cf, nil
@@ -280,6 +284,9 @@ func resolveDomains(ctx context.Context, cmd *cli.Command, cf *cloudflare.Client
 }
 
 func writeFile(domain string, data []byte) error {
+	if domain == "" || domain == "." || strings.Contains(domain, "..") || strings.ContainsAny(domain, "/\\") {
+		return fmt.Errorf("invalid domain name: %q", domain)
+	}
 	dir, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("getwd: %w", err)

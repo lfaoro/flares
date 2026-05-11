@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go: ["1.26", "stable"]
+        go: ["1.26.3", "stable"]
 
     steps:
       - uses: actions/checkout@v6
