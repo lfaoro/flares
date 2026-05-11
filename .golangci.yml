@@ -28,7 +28,6 @@ linters:
     - ineffassign
     - goconst
     - nolintlint
-    - gofmt
   disable:
     - lll
     - wrapcheck
@@ -59,3 +58,7 @@ run:
 issues:
   max-issues-per-linter: 0
   max-same-issues: 50
+
+formatters:
+  enable:
+    - gofmt
