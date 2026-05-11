@@ -1,88 +1,106 @@
 # Flares 🔥
 
-Flares is a CloudFlare DNS backup tool, it dumps your DNS table to the screen or exports it as BIND formatted zone
-files.
-
-[![BSD License](https://img.shields.io/badge/license-BSD-blue.svg?style=flat)](LICENSE)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flfaoro%2Fflares.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flfaoro%2Fflares?ref=badge_shield)
-[![Go Report Card](https://goreportcard.com/badge/github.com/lfaoro/flares)](https://goreportcard.com/report/github.com/lfaoro/flares)
-
-![Docker Pulls](https://img.shields.io/docker/pulls/lfaoro/flares.svg?logo=docker&style=popout-square)
-[![PayPal](https://img.shields.io/badge/paypal-contribute-blue.svg?style=popout-square&logo=paypal)](https://www.paypal.com/pools/c/8fm4OKBYMa)
+Cloudflare DNS backup tool — exports DNS records as BIND-formatted zone files to stdout or disk.
 
 ## Quick Start
 
-### [Video Tutorial](https://asciinema.org/a/NLVa6TyQzvTEhnzZDdH1q79lO)
-
-### Docker
 ```bash
-# Fetch your CloudFlare API token from here:
-# https://dash.cloudflare.com/profile/api-tokens
-# -> Create Token
-# -> Edit zone DNS
-# -> Permission: read
-# -> Zone resources: Include -> All zones
+export CLOUDFLARE_API_TOKEN="KClp4y8BgD2LQiz2..."
 
-$ export CF_API_TOKEN="KClp4y8BgD2LQiz2..."
+# Show DNS records for a domain
+flares show example.com
 
-$ docker run -it --rm \
--e CF_API_TOKEN="$CF_API_TOKEN" \
-lfaoro/flares domain1.tld domain2.tld
+# Export as BIND zone file
+flares export example.com
+
+# All zones at once
+flares show --all
+flares export --all
+
+# List zones
+flares zones
 ```
 
-### macOS
+Get your token at https://dash.cloudflare.com/profile/api-tokens (Create Token → Zone.DNS → Read → All zones).
+
+## Install
+
 ```bash
+# Homebrew (macOS/Linux)
 brew install lfaoro/tap/flares
+
+# Scoop (Windows)
+scoop bucket add lfaoro https://github.com/lfaoro/tap
+scoop install lfaoro/flares
+
+# Go
+go install github.com/lfaoro/flares/cmd/flares@latest
+
+# Docker
+docker run --rm -e CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" lfaoro/flares show example.com
 ```
 
-### Linux/BSD
+## Usage
+
+```
+flares [--token TOKEN] [--debug] <command> [flags] [<domain>...]
+
+Commands:
+  show      Print DNS records
+    --all, -a             All zones
+    --output, -o FORMAT   Output format: text (default) or json
+
+  export    Write BIND zone files
+    --all, -a             All zones
+
+  zones     List all zone IDs and names
+
+Global flags:
+  --token, -t   Cloudflare API token  [$CLOUDFLARE_API_TOKEN, $CF_API_TOKEN]
+  --debug, -d   Enable debug output   [$FLARES_DEBUG]
+  --threads, -c Max concurrent API requests for --all (default: 10) [$FLARES_THREADS]
+```
+
+### JSON Output
+
 ```bash
-curl https://raw.githubusercontent.com/lfaoro/flares/master/install.sh | bash
+flares show --output json example.com
 ```
 
-### Developers
-> Go installer: https://golang.org/dl/
-```bash
-go get -u github.com/lfaoro/flares
-make install
-flares -h
+Returns `{"example.com": "; Domain: example.com\n...BIND records..."}` — useful for scripting.
 
-make test
-```
-
-## Examples
+### Using --all
 
 ```bash
-$ make install
-$ flares -h
+# Dump all zones to stdout
+flares show --all
 
-$ flares domain1.tld
-;;
-;; Domain:     domain1.tld
-;; Exported:   2019-06-03 06:31:29
-...continued
-
-$ flares --export domain1.tld domain2.tld
-BIND table for domain1.tld successfully exported
-BIND table for domain2.tld successfully exported
-$ ls
-domain1.tld domain2.tld
+# Export every zone to its own file in the current directory
+flares export --all
 ```
 
-## Automation
+Concurrent exports are throttled to 10 simultaneous requests to avoid Cloudflare rate limits.
 
-### GitLab CI/CD
+## Token
 
-- Copy [.gitlab-ci.yml](.gitlab-ci.yml) inside your repo
-- Use the [pipeline schedules](https://gitlab.com/help/user/project/pipelines/schedules) feature
-- Each run of the task will generate a DNS backup stored as a downloadable artifact
+Create a token at https://dash.cloudflare.com/profile/api-tokens with:
 
-# Contributing
+- **Permissions**: Zone → DNS → Read
+- **Zone Resources**: Include → All zones
 
-> Any help and suggestions are very welcome and appreciated. Start by opening an [issue](https://github.com/lfaoro/flares/issues/new).
+Verify your token:
 
-- Fork the project
-- Create your feature branch `git checkout -b my-new-feature`
-- Commit your changes `git commit -am 'Add my feature'`
-- Push to the branch `git push origin my-new-feature`
-- Create a new pull request against the master branch
+```bash
+curl -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  https://api.cloudflare.com/client/v4/user/tokens/verify
+```
+
+## Development
+
+```bash
+nix-shell                 # Go 1.26, golangci-lint, goreleaser, gofumpt
+make build               # Build binary
+make test                # Run all tests
+make lint                # golangci-lint (30+ linters)
+make reltest             # Dry-run goreleaser snapshot
+```

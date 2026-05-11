@@ -1,29 +1,18 @@
 variables:
   GIT_STRATEGY: fetch
-  DOCKER_DRIVER: overlay
-
-services:
-  - docker:dind
 
 backup:
-  image: docker
+  image: lfaoro/flares
   stage: build
   retry: 2
   script: |
-    # Fetch your CloudFlare API token from here:
-    # https://dash.cloudflare.com/profile/api-tokens
-    # -> Create Token
-    # -> Edit zone DNS
-    # -> Permission: read
-    # -> Zone resources: Include -> All zones
+    # Create a token at https://dash.cloudflare.com/profile/api-tokens
+    # Required scope: Zone.DNS -> Read
 
-    docker run -t --rm \
-    -e CF_API_TOKEN="$CF_API_TOKEN" \
-    lfaoro/flares --all > dns_backup.bind
+    flares export --all
   artifacts:
     untracked: true
-    # uncomment if needed (default is forever on gitlab.com)
-    # expire_in: 4 week
-    name: "bck-${date}"
+    expire_in: 4 weeks
+    name: "dns-backup-${CI_PIPELINE_ID}"
     paths:
-      - dns_backup.bind
+      - ./*

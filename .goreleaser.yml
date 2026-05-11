@@ -1,59 +1,144 @@
+version: 2
+
 builds:
-  - env:
+  - id: flares
+    main: ./cmd/flares
+    env:
       - CGO_ENABLED=0
-    flags:
-      - -mod=vendor
+    ldflags:
+      - -s -w
+      - -X main.version={{ .Version }}
+      - -X main.commit={{ .Commit }}
+      - -X main.date={{ .Date }}
     goos:
-      - darwin
       - linux
+      - darwin
       - freebsd
+      - windows
     goarch:
       - amd64
+      - arm64
+
+archives:
+  - id: flares
+    formats:
+      - tar.gz
+    name_template: >-
+      flares_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - LICENSE
 
 checksum:
   name_template: "checksums.txt"
-signs:
-  - artifacts: checksum
+
 snapshot:
-  name_template: "{{ .Tag }}"
+  version_template: "{{ .Version }}-SNAPSHOT-{{ .ShortCommit }}"
+
 changelog:
   sort: asc
   filters:
     exclude:
       - "^docs:"
       - "^test:"
-      - "^vendor:"
       - "^refactor:"
+      - "^ci:"
+      - "^chore:"
 
-brews:
-  - # Repository to push the tap to.
-    tap:
+release:
+  github:
+    owner: lfaoro
+    name: flares
+
+homebrew_casks:
+  - name: flares
+    repository:
       owner: lfaoro
       name: tap
-
-    # Git author used to commit to the repository.
-    # Defaults are shown.
     commit_author:
       name: Leonardo Faoro
-      email: lfaoro@gmail.com
-
-    # Your app's homepage.
-    # Default is empty.
+      email: flares@leonardofaoro.com
+    description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
     homepage: "https://github.com/lfaoro/flares"
+    license: "MIT"
 
-    # Your app's description.
-    # Default is empty.
-    description: "Flares is a CloudFlare DNS backup tool"
+scoops:
+  - name: flares
+    repository:
+      owner: lfaoro
+      name: tap
+    directory: scoop
+    commit_author:
+      name: Leonardo Faoro
+      email: flares@leonardofaoro.com
+    description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
+    homepage: "https://github.com/lfaoro/flares"
+    license: "MIT"
 
-    # Setting this will prevent goreleaser to actually try to commit the updated
-    # formula - instead, the formula file will be stored on the dist folder only,
-    # leaving the responsibility of publishing it to the user.
-    # If set to auto, the release will not be uploaded to the homebrew tap
-    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
-    # Default is false.
-    skip_upload: false
+aurs:
+  - name: flares
+    commit_author:
+      name: Leonardo Faoro
+      email: flares@leonardofaoro.com
+    description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
+    homepage: "https://github.com/lfaoro/flares"
+    license: "MIT"
+    maintainers:
+      - "Leonardo Faoro <flares@leonardofaoro.com>"
 
-    # So you can `brew test` your formula.
-    # Default is empty.
-    test: |
-      system "#{bin}/flares --version"
+nix:
+  - name: flares
+    repository:
+      owner: lfaoro
+      name: nix
+    commit_author:
+      name: Leonardo Faoro
+      email: flares@leonardofaoro.com
+    description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
+    homepage: "https://github.com/lfaoro/flares"
+    license: "mit"
+
+winget:
+  - name: lfaoro.flares
+    repository:
+      owner: lfaoro
+      name: tap
+    commit_author:
+      name: Leonardo Faoro
+      email: flares@leonardofaoro.com
+    publisher: "Leonardo Faoro"
+    publisher_url: "https://github.com/lfaoro/tap"
+    publisher_support_url: "https://github.com/lfaoro/flares/issues"
+    description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
+    short_description: "Cloudflare DNS backup tool"
+    homepage: "https://github.com/lfaoro/flares"
+    license: "MIT"
+    tags:
+      - cloudflare
+      - dns
+      - backup
+      - bind
+      - zone
+
+dockers_v2:
+  - images:
+      - lfaoro/flares
+    tags:
+      - "{{ .Version }}"
+      - "{{ if not .IsNightly }}latest{{ end }}"
+      - "{{ if not .IsNightly }}{{ .Major }}.{{ .Minor }}{{ end }}"
+    dockerfile: Dockerfile
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      "org.opencontainers.image.title": "Flares"
+      "org.opencontainers.image.description": "Cloudflare DNS backup tool"
+      "org.opencontainers.image.url": "https://github.com/lfaoro/flares"
+      "org.opencontainers.image.source": "https://github.com/lfaoro/flares"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.created": "{{ .Date }}"
+      "org.opencontainers.image.licenses": "MIT"
