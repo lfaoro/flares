@@ -2,7 +2,7 @@ APP     ?= ./cmd/flares
 VERSION ?= 1.0.0
 LDFLAGS += -X "main.date=$(shell date '+%Y-%m-%d %I:%M:%S %Z')"
 
-.PHONY: install build tag release reltest dep clean docker fmt vet lint tidy build-all test mise
+.PHONY: install build build-all tag release reltest dep clean docker nix fmt vet test lint tidy mise tidy-check check hooks dev
 
 install:
 	@go install -ldflags='$(LDFLAGS)' "$(APP)"
@@ -63,7 +63,7 @@ vet:
 	go vet ./...
 
 test:
-	go test ./...
+	go test -v -race -shuffle=on -count=1 ./...
 
 lint:
 	golangci-lint run ./...
@@ -74,9 +74,19 @@ tidy:
 mise:
 	mise install
 
+# Run the same checks as CI before pushing.
+check: tidy-check build vet lint test
+
+tidy-check:
+	go mod tidy
+	git diff --exit-code go.mod go.sum
+
+hooks: .githooks/pre-push
+	git config core.hooksPath .githooks
+
 dev:
 	@echo "Choose your dev environment:"
 	@echo "  make nix   — nix-shell"
 	@echo "  make mise  — mise install"
-	@echo "Then: make build && make test"
+	@echo "Then: make check"
 

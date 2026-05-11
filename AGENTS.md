@@ -18,11 +18,14 @@ Global flags: `--token` (`$CLOUDFLARE_API_TOKEN`, fallback `$CF_API_TOKEN`), `--
 
 ```bash
 make dev                           # choose dev environment (mise or nix)
-go build ./cmd/flares              # binary at ./flares
-go test ./...                      # all tests
+make check                         # full CI suite: tidy-check → build → vet → lint → test
+make hooks                         # install .githooks/pre-push (runs make check before push)
+make test                          # go test -v -race -shuffle=on -count=1 ./...
 make lint                          # golangci-lint run ./... (30+ linters, see .golangci.yml)
 make reltest                       # goreleaser snapshot without docker
 ```
+
+Pre-push hook auto-installed via `make hooks`. It runs `make check` (go mod tidy check, build, vet, lint, test with race detector). This matches the CI pipeline — if `make check` passes locally, CI should too.
 
 ## Testing Patterns
 

@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+echo "=== Pre-push: running CI checks ==="
+make check
+echo "=== Pre-push: all checks passed ==="
