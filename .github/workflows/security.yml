@@ -32,7 +32,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Run gosec
-        uses: securego/gosec@v2
+      - name: Set up Go
+        uses: actions/setup-go@v6
         with:
-          args: ./...
+          go-version: stable
+
+      - name: Run gosec
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          gosec ./...
