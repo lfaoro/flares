@@ -42,9 +42,9 @@ jobs:
         run: go vet ./...
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: latest
+          version: v2.12.2
 
       - name: Test
         run: go test -v -race -shuffle=on -coverprofile=coverage.out ./...
