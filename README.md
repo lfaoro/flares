@@ -25,23 +25,32 @@ Get your token at https://dash.cloudflare.com/profile/api-tokens (Create Token â
 
 ## Install
 
+### Package Managers
+
+| Platform | Command |
+|----------|---------|
+| macOS / Linux | `brew install lfaoro/tap/flares` |
+| Windows | `scoop bucket add lfaoro https://github.com/lfaoro/tap`<br>`scoop install lfaoro/flares` |
+| Windows | `winget install lfaoro.flares` |
+| Arch Linux | `yay -S flares-bin` (AUR) |
+| Nix | `nix profile install github:lfaoro/tap#flares` |
+| Go | `go install github.com/lfaoro/flares/cmd/flares@latest` |
+
+### Pre-built Binaries
+
+Download the latest archive for your platform from the [releases page](https://github.com/lfaoro/flares/releases), then:
+
 ```bash
-# Homebrew (macOS/Linux)
-brew install lfaoro/tap/flares
+tar xzf flares_*.tar.gz
+sudo mv flares /usr/local/bin/
+```
 
-# Scoop (Windows)
-scoop bucket add lfaoro https://github.com/lfaoro/tap
-scoop install lfaoro/flares
-
-# Go
-go install github.com/lfaoro/flares/cmd/flares@latest
-
-# Docker
+### Docker
 
 ```bash
 docker pull ghcr.io/lfaoro/flares
-docker run --rm -e CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" ghcr.io/lfaoro/flares show example.com
-```
+docker run --rm -e CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" \
+  ghcr.io/lfaoro/flares show example.com
 ```
 
 ## Usage
