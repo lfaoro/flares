@@ -27,13 +27,12 @@ jobs:
         with:
           go-version: stable
 
-      - name: Build
-        run: go build -o flares ./cmd/flares
-
-      - name: Install
+      - name: Build and install
+        shell: bash
         run: |
+          EXE="$(go env GOEXE)"
           mkdir -p "$HOME/bin"
-          mv flares "$HOME/bin/"
+          go build -o "$HOME/bin/flares$EXE" ./cmd/flares
           echo "$HOME/bin" >> "$GITHUB_PATH"
 
       - name: Test version
@@ -67,6 +66,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Wait for release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = process.env.GITHUB_REF_NAME;
+            for (let i = 0; i < 30; i++) {
+              try {
+                await github.rest.repos.getReleaseByTag({ owner: context.repo.owner, repo: context.repo.repo, tag });
+                return;
+              } catch {
+                await new Promise(r => setTimeout(r, 10000));
+              }
+            }
+            core.setFailed('Release not found after 5 minutes');
+
       - name: Install via script
         run: |
           curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /tmp/flares-test
