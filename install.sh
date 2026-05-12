@@ -17,7 +17,7 @@ EOF
 }
 
 log() { echo "$@" 1>&2; }
-debug() { [ -n "$DEBUG" ] && log "debug:" "$@"; }
+debug() { [ -n "${DEBUG:-}" ] && log "debug:" "$@"; }
 
 BINDIR=/usr/local/bin
 TAG=
