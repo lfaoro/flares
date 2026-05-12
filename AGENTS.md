@@ -8,6 +8,8 @@ See also [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide (age
 
 > **Never commit or push without asking first.** Stage changes, show the diff, and wait for explicit instructions before committing or pushing to any remote.
 
+> **Always load the `coding` skill** for behavioral guidelines on simplicity, surgical changes, and goal-driven execution. Merge with these project-specific instructions.
+
 ## Commands
 
 ```
