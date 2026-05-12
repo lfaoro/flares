@@ -80,6 +80,9 @@ scoops:
 
 aurs:
   - name: flares
+    repository:
+      owner: lfaoro
+      name: tap
     commit_author:
       name: Leonardo Faoro
       email: flares@leonardofaoro.com
@@ -93,7 +96,7 @@ nix:
   - name: flares
     repository:
       owner: lfaoro
-      name: nix
+      name: tap
     commit_author:
       name: Leonardo Faoro
       email: flares@leonardofaoro.com
