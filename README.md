@@ -28,13 +28,13 @@ Get your token at https://dash.cloudflare.com/profile/api-tokens (Create Token â
 ### One-liner
 
 ```bash
-curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh
+curl -sfL https://raw.githubusercontent.com/lfaoro/flares/main/install.sh | sh
 ```
 
 Install a specific version to a custom path:
 
 ```bash
-curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /usr/local/bin v4.0.1
+curl -sfL https://raw.githubusercontent.com/lfaoro/flares/main/install.sh | sh -s -- -b /usr/local/bin v4.0.1
 ```
 
 ### Package Managers

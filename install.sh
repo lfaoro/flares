@@ -10,8 +10,8 @@ Usage: $0 [-b <bindir>] [-d] [<version>]
   <version>    Release tag (default: latest)
 
 Examples:
-  curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh
-  curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /usr/local/bin v4.0.1
+  curl -sfL https://raw.githubusercontent.com/lfaoro/flares/main/install.sh | sh
+  curl -sfL https://raw.githubusercontent.com/lfaoro/flares/main/install.sh | sh -s -- -b /usr/local/bin v4.0.1
 EOF
   exit 2
 }

@@ -68,8 +68,9 @@ jobs:
     steps:
       - name: Install via script
         run: |
-          for i in $(seq 1 30); do
-            curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /tmp/flares-test && break
+          TAG="${{ github.ref_name }}"
+          for ((i=1; i<=30; i++)); do
+            curl -sfL "https://raw.githubusercontent.com/lfaoro/flares/$TAG/install.sh" | sh -s -- -b /tmp/flares-test && break
             sleep 10
           done
           /tmp/flares-test/flares --version
@@ -77,8 +78,9 @@ jobs:
       - name: Test specific version
         run: |
           VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-          for i in $(seq 1 30); do
-            curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /tmp/flares-version "$VERSION" && break
+          TAG="${{ github.ref_name }}"
+          for ((i=1; i<=30; i++)); do
+            curl -sfL "https://raw.githubusercontent.com/lfaoro/flares/$TAG/install.sh" | sh -s -- -b /tmp/flares-version "$VERSION" && break
             sleep 10
           done
           /tmp/flares-version/flares --version | grep -q "$VERSION"
