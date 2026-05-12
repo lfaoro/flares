@@ -71,18 +71,6 @@ aurs:
     maintainers:
       - "Leonardo Faoro <flares@leonardofaoro.com>"
 
-nix:
-  - name: flares
-    repository:
-      owner: lfaoro
-      name: tap
-    commit_author:
-      name: Leonardo Faoro
-      email: flares@leonardofaoro.com
-    description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
-    homepage: "https://github.com/lfaoro/flares"
-    license: "mit"
-
 dockers_v2:
   - images:
       - ghcr.io/lfaoro/flares
@@ -91,6 +79,8 @@ dockers_v2:
       - latest
     dockerfile: Dockerfile
     platforms: [linux/amd64]
+    extra_files:
+      - flares
     labels:
       "org.opencontainers.image.title": "Flares"
       "org.opencontainers.image.description": "Cloudflare DNS backup tool"

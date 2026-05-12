@@ -37,6 +37,14 @@ jobs:
         uses: goreleaser/goreleaser-action@v7
         with:
           version: "~> v2"
-          args: release --clean --skip=homebrew,aur,nix
+          args: release --clean --skip=docker,homebrew,aur,nix
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cp dist/flares_linux_amd64_v1/flares .
+          docker build -t "ghcr.io/lfaoro/flares:${VERSION}" -t ghcr.io/lfaoro/flares:latest .
+          docker push "ghcr.io/lfaoro/flares:${VERSION}"
+          docker push ghcr.io/lfaoro/flares:latest
