@@ -1,5 +1,12 @@
 # Flares 🔥
 
+[![Go](https://img.shields.io/github/go-mod/go-version/lfaoro/flares?logo=go)](https://github.com/lfaoro/flares)
+[![Release](https://img.shields.io/github/v/release/lfaoro/flares?logo=github)](https://github.com/lfaoro/flares/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/lfaoro/flares/ci.yml?branch=main&label=CI&logo=github)](https://github.com/lfaoro/flares/actions)
+[![Downloads](https://img.shields.io/github/downloads/lfaoro/flares/total?logo=github)](https://github.com/lfaoro/flares/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/lfaoro/flares?logo=docker)](https://hub.docker.com/r/lfaoro/flares)
+[![License](https://img.shields.io/github/license/lfaoro/flares)](LICENSE)
+
 Cloudflare DNS backup tool — exports DNS records as BIND-formatted zone files to stdout or disk.
 
 ## Quick Start
