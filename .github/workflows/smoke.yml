@@ -66,28 +66,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Wait for release
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const tag = process.env.GITHUB_REF_NAME;
-            for (let i = 0; i < 30; i++) {
-              try {
-                await github.rest.repos.getReleaseByTag({ owner: context.repo.owner, repo: context.repo.repo, tag });
-                return;
-              } catch {
-                await new Promise(r => setTimeout(r, 10000));
-              }
-            }
-            core.setFailed('Release not found after 5 minutes');
-
       - name: Install via script
         run: |
-          curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /tmp/flares-test
+          for i in $(seq 1 30); do
+            curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /tmp/flares-test && break
+            sleep 10
+          done
           /tmp/flares-test/flares --version
 
       - name: Test specific version
         run: |
           VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-          curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /tmp/flares-version "$VERSION"
+          for i in $(seq 1 30); do
+            curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh | sh -s -- -b /tmp/flares-version "$VERSION" && break
+            sleep 10
+          done
           /tmp/flares-version/flares --version | grep -q "$VERSION"
