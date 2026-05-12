@@ -43,14 +43,10 @@ case "$ARCH" in
 esac
 
 case "$OS" in
-  msys_nt*|mingw*) OS=windows ;;
+  msys_nt*|mingw*) echo "Windows is not supported"; exit 1 ;;
 esac
 
-if [ "$OS" = windows ]; then
-  BINARY=flares.exe
-else
-  BINARY=flares
-fi
+BINARY=flares
 
 FORMAT=tar.gz
 OWNER=lfaoro

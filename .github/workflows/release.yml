@@ -40,6 +40,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v7
         with:
           version: "~> v2"
-          args: release --clean --skip=homebrew,scoop,winget,aur,nix
+          args: release --clean --skip=homebrew,aur,nix
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

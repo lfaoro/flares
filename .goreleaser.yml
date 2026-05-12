@@ -14,7 +14,6 @@ builds:
       - linux
       - darwin
       - freebsd
-      - windows
     goarch:
       - amd64
       - arm64
@@ -25,10 +24,6 @@ archives:
       - tar.gz
     name_template: >-
       flares_{{ .Version }}_{{ .Os }}_{{ .Arch }}
-    format_overrides:
-      - goos: windows
-        formats:
-          - zip
     files:
       - LICENSE
 
@@ -65,19 +60,6 @@ homebrew_casks:
     homepage: "https://github.com/lfaoro/flares"
     license: "MIT"
 
-scoops:
-  - name: flares
-    repository:
-      owner: lfaoro
-      name: tap
-    directory: scoop
-    commit_author:
-      name: Leonardo Faoro
-      email: flares@leonardofaoro.com
-    description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
-    homepage: "https://github.com/lfaoro/flares"
-    license: "MIT"
-
 aurs:
   - name: flares
     commit_author:
@@ -100,28 +82,6 @@ nix:
     description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
     homepage: "https://github.com/lfaoro/flares"
     license: "mit"
-
-winget:
-  - name: lfaoro.flares
-    repository:
-      owner: lfaoro
-      name: tap
-    commit_author:
-      name: Leonardo Faoro
-      email: flares@leonardofaoro.com
-    publisher: "Leonardo Faoro"
-    publisher_url: "https://github.com/lfaoro/tap"
-    publisher_support_url: "https://github.com/lfaoro/flares/issues"
-    description: "Cloudflare DNS backup tool — export DNS records as BIND zone files"
-    short_description: "Cloudflare DNS backup tool"
-    homepage: "https://github.com/lfaoro/flares"
-    license: "MIT"
-    tags:
-      - cloudflare
-      - dns
-      - backup
-      - bind
-      - zone
 
 dockers_v2:
   - images:

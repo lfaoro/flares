@@ -42,8 +42,6 @@ curl -sfL https://github.com/lfaoro/flares/releases/latest/download/install.sh |
 | Platform | Command |
 |----------|---------|
 | macOS / Linux | `brew install lfaoro/tap/flares` |
-| Windows | `scoop bucket add lfaoro https://github.com/lfaoro/tap`<br>`scoop install lfaoro/flares` |
-| Windows | `winget install lfaoro.flares` |
 | Arch Linux | `yay -S flares-bin` (AUR) |
 | Nix | `nix profile install github:lfaoro/tap#flares` |
 | Go | `go install github.com/lfaoro/flares/cmd/flares@latest` |
