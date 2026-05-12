@@ -122,3 +122,20 @@ winget:
       - backup
       - bind
       - zone
+
+dockers_v2:
+  - images:
+      - ghcr.io/lfaoro/flares
+    tags:
+      - "{{ .Version }}"
+      - latest
+    dockerfile: Dockerfile
+    platforms: [linux/amd64]
+    labels:
+      "org.opencontainers.image.title": "Flares"
+      "org.opencontainers.image.description": "Cloudflare DNS backup tool"
+      "org.opencontainers.image.url": "https://github.com/lfaoro/flares"
+      "org.opencontainers.image.source": "https://github.com/lfaoro/flares"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.created": "{{ .Date }}"
+      "org.opencontainers.image.licenses": "MIT"
