@@ -131,9 +131,6 @@ dockers_v2:
       - "{{ if not .IsNightly }}latest{{ end }}"
       - "{{ if not .IsNightly }}{{ .Major }}.{{ .Minor }}{{ end }}"
     dockerfile: Dockerfile
-    platforms:
-      - linux/amd64
-      - linux/arm64
     labels:
       "org.opencontainers.image.title": "Flares"
       "org.opencontainers.image.description": "Cloudflare DNS backup tool"
