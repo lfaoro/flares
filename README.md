@@ -37,7 +37,11 @@ scoop install lfaoro/flares
 go install github.com/lfaoro/flares/cmd/flares@latest
 
 # Docker
-docker run --rm -e CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" lfaoro/flares show example.com
+
+```bash
+docker pull ghcr.io/lfaoro/flares
+docker run --rm -e CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" ghcr.io/lfaoro/flares show example.com
+```
 ```
 
 ## Usage
