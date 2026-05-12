@@ -1,10 +1,26 @@
+# Built binary
+/flares
+/flares-*
+
+# Go
+vendor/
+*.test
+*.out
+
+# Build output
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project-specific
 .env
 idea.md
 *.bind
-.dockerignore
-.vscode/
-.idea/
-dist/
-vendor/
-/flares
-/flares-*

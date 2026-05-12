@@ -6,6 +6,8 @@ See also [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide (age
 
 > **Before every push**: update [CHANGES.md](CHANGES.md) with unreleased changes and keep AGENTS.md in sync with the current codebase. These files are the contract between agents and maintainers.
 
+> **Never commit or push without asking first.** Stage changes, show the diff, and wait for explicit instructions before committing or pushing to any remote.
+
 ## Commands
 
 ```

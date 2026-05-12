@@ -50,8 +50,8 @@ clean:
 	rm -rf dist/
 
 docker:
-	docker build -t lfaoro/flares .
-	#docker push lfaoro/flares
+	docker build -t ghcr.io/lfaoro/flares .
+	docker push ghcr.io/lfaoro/flares
 
 nix:
 	nix-shell --run "echo 'Nix dev shell ready'"

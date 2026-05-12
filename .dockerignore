@@ -1,0 +1,6 @@
+.git/
+.gitignore
+.gitattributes
+*.md
+dist/
+vendor/

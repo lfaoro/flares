@@ -2,7 +2,7 @@ variables:
   GIT_STRATEGY: fetch
 
 backup:
-  image: lfaoro/flares
+  image: ghcr.io/lfaoro/flares
   stage: build
   retry: 2
   script: |
